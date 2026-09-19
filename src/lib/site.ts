@@ -21,7 +21,7 @@ function resolveUrl(): string {
   if (explicit) return explicit.replace(/\/$/, '');
 
   const host =
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL ?? 'koviid.com';
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL ?? 'koviid.me';
   return `https://${host.replace(/\/$/, '')}`;
 }
 

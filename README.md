@@ -34,7 +34,7 @@ npm run build && npm start
    | ---------------------- | ---------------------------------------------------- |
    | `ROOBET_API_KEY`       | The affiliate bearer token.                            |
    | `ROOBET_USER_ID`       | The `id` claim inside that token's JWT payload.        |
-   | `NEXT_PUBLIC_SITE_URL` | Your final origin, e.g. `https://koviid.com`. Optional. |
+   | `NEXT_PUBLIC_SITE_URL` | Your final origin, e.g. `https://koviid.me`. Optional. |
 
    `NEXT_PUBLIC_SITE_URL` only affects canonical URLs, the sitemap and the
    OpenGraph tags. Left unset, the site falls back to Vercel's own production
