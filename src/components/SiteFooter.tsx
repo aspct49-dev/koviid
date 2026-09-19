@@ -7,7 +7,7 @@ import {
   SOCIAL_PLATFORMS,
 } from '@/lib/partners';
 import { SITE } from '@/lib/site';
-import { KickIcon, XIcon } from './icons';
+import { DiscordIcon, KickIcon, XIcon } from './icons';
 
 /**
  * The foot of the site.
@@ -20,6 +20,7 @@ import { KickIcon, XIcon } from './icons';
 const MARKS: Record<string, React.ComponentType<{ className?: string }>> = {
   kick: KickIcon,
   x: XIcon,
+  discord: DiscordIcon,
 };
 
 export function SiteFooter() {

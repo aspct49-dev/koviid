@@ -169,6 +169,16 @@ export const SOCIALS: SocialCard[] = [
     social: true,
   },
   {
+    id: 'discord',
+    name: 'Discord',
+    handle: 'Community server',
+    blurb: 'Prize claims, VIP transfers and everyone else playing the board.',
+    href: DISCORD_INVITE,
+    hue: 'var(--hue-blurple)',
+    cta: 'Join',
+    social: true,
+  },
+  {
     id: 'roobet',
     name: 'Roobet',
     handle: `Code ${PARTNERS.roobet.code}`,

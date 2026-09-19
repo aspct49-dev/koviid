@@ -1,6 +1,6 @@
 import { SOCIALS } from '@/lib/partners';
 import { TiltCard } from './TiltCard';
-import { ArrowIcon, KickIcon, RoobetIcon, XIcon } from './icons';
+import { ArrowIcon, DiscordIcon, KickIcon, RoobetIcon, XIcon } from './icons';
 
 /**
  * Where to find Koviid.
@@ -13,6 +13,7 @@ import { ArrowIcon, KickIcon, RoobetIcon, XIcon } from './icons';
 const MARKS: Record<string, React.ComponentType<{ className?: string }>> = {
   kick: KickIcon,
   x: XIcon,
+  discord: DiscordIcon,
   roobet: RoobetIcon,
 };
 
