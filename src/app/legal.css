@@ -1,0 +1,144 @@
+/* ===========================================================================
+   KOVIID — terms and privacy
+
+   Long-form prose, which nothing else on this site is. One measure, and enough
+   contrast to be read rather than skimmed: a legal page set in dim grey at
+   12px is a way of publishing something without saying it.
+   =========================================================================== */
+
+.legal { padding-block: clamp(30px, 5vw, 56px) clamp(40px, 6vw, 72px); }
+
+.legal-back { display: inline-block; margin-bottom: clamp(24px, 3.4vw, 38px); }
+.legal-back img {
+  width: auto;
+  height: clamp(34px, 4vw, 46px);
+  opacity: 0.9;
+  transition: opacity 0.2s var(--ease);
+}
+.legal-back:hover img { opacity: 1; }
+
+.legal-head {
+  max-width: 72ch;
+  padding-bottom: clamp(20px, 2.6vw, 28px);
+  border-bottom: 1px solid var(--edge);
+}
+.legal-updated {
+  margin: 14px 0 0;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+.legal-lede {
+  margin: 16px 0 0;
+  max-width: 68ch;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.legal-body { max-width: 72ch; }
+
+.legal-body section { margin-top: clamp(28px, 3.6vw, 40px); }
+
+.legal-body h2 {
+  margin-bottom: 12px;
+  font-size: clamp(18px, 2vw, 21px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.legal-body p {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+.legal-body p:last-child { margin-bottom: 0; }
+.legal-body b { color: var(--text); font-weight: 600; }
+
+.legal-body a {
+  color: var(--blue-hot);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(124, 196, 255, 0.4);
+  transition: text-decoration-color 0.18s var(--ease);
+}
+.legal-body a:hover { text-decoration-color: var(--blue-hot); }
+
+.legal-body ul {
+  margin: 0 0 14px;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 11px;
+}
+.legal-body li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+/* A small square, not a disc, matching the grid behind the hero. */
+.legal-body li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0.68em;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--blue);
+}
+
+/* The prize split as a table, not a sentence: it is the one piece of the
+   terms someone arrives already looking for. */
+.legal-prizes {
+  gap: 0 !important;
+  margin-top: 4px;
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.legal-prizes li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 16px;
+  background: rgba(13, 20, 38, 0.4);
+}
+.legal-prizes li:nth-child(even) { background: rgba(5, 8, 15, 0.5); }
+.legal-prizes li::before { display: none; }
+.legal-prizes span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--dim);
+}
+.legal-prizes b {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* Still needs the operator's own details. A visible block, not a code
+   comment: the person who has to fill these in is reading the page, not the
+   repository. */
+.legal-todo {
+  margin-top: 16px !important;
+  padding: 14px 16px;
+  border: 1px dashed var(--edge-lit);
+  border-radius: var(--r);
+  background: rgba(27, 132, 255, 0.05);
+  font-size: 14px !important;
+  color: var(--muted) !important;
+}
+
+.legal-return { margin-top: clamp(34px, 4.4vw, 52px); }

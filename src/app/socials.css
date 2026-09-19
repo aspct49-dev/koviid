@@ -1,0 +1,211 @@
+/* ===========================================================================
+   KOVIID — socials rack
+
+   Two places to follow along and one place to sign up, as the same kind of
+   card because at this point they are the same kind of decision.
+   =========================================================================== */
+
+.rack {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/*
+ * The perspective lives on a wrapper, not on the card and not on the rack.
+ *
+ * `perspective` sets a vanishing point for an element's *children*, so on the
+ * card itself it would do nothing. On the shared rack it would be worse: one
+ * vanishing point centred on all three skews the outer cards toward the middle
+ * even at rest. One stage per card gives each its own centre.
+ */
+.soc-stage {
+  perspective: 1000px;
+  /* The lifted card and its glow both overflow this box; without this the
+     grid cell clips the top edge of whichever card is being hovered. */
+  overflow: visible;
+}
+
+/*
+ * The podium plate at a smaller size.
+ *
+ * `--hue` comes off the element in the markup, so one ruleset serves all three
+ * cards. `--rx`, `--ry`, `--mx`, `--my` and `--lift` are written by `TiltCard`
+ * on pointer move; the defaults below are the resting state, so the card is
+ * correct before any script runs and correct if none ever does.
+ */
+.soc {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 14%;
+  --my: 0%;
+  --lift: 0;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  padding: 22px;
+  border: 1px solid var(--edge);
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--hull) 0%, #05080f 100%);
+
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) translateZ(calc(var(--lift) * 14px));
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition:
+    transform 0.32s var(--ease-out),
+    border-color 0.28s var(--ease),
+    box-shadow 0.32s var(--ease);
+}
+
+/* Tracking has to be near-immediate or the tilt lags behind the pointer. The
+   longer transition above plays on the way in and on the way out. */
+.soc:hover {
+  transition:
+    transform 0.08s linear,
+    border-color 0.28s var(--ease),
+    box-shadow 0.32s var(--ease);
+  border-color: color-mix(in srgb, var(--hue) 55%, var(--edge));
+  /* Wide and weak, not tight and bright. A short blur with a big negative
+     spread concentrates the whole glow into a puddle directly under the card,
+     which reads as a coloured shadow rather than as light coming off it. */
+  box-shadow:
+    0 30px 70px -40px color-mix(in srgb, var(--hue) 70%, transparent),
+    0 0 56px -26px color-mix(in srgb, var(--hue) 80%, transparent),
+    0 20px 46px -30px rgba(0, 0, 0, 0.9);
+}
+
+/* Anchored to the corner the mark is in, so the card looks lit by its own
+   icon rather than tinted as a whole. */
+.soc::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(64% 72% at 14% 0%, var(--hue) 0%, transparent 68%);
+  opacity: 0.1;
+  transition: opacity 0.28s var(--ease);
+  pointer-events: none;
+}
+.soc:hover::before { opacity: 0.2; }
+
+/*
+ * The specular, following the cursor. Small radius, because a wide soft one
+ * reads as the whole card changing colour. White rather than the card's hue:
+ * a coloured highlight looks like the card glowing, and the point is that
+ * something else is shining on it.
+ *
+ * `screen` so it brightens what is under it instead of painting over it, and
+ * the border stays visible through the bright spot.
+ */
+.soc-gloss {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    38% 48% at var(--mx) var(--my),
+    rgba(255, 255, 255, 0.26) 0%,
+    rgba(255, 255, 255, 0.08) 40%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  opacity: var(--lift);
+  transition: opacity 0.3s var(--ease);
+  pointer-events: none;
+}
+
+/* Lifted off the card's plane, so the tilt produces parallax instead of a
+   flat image being rotated. */
+.soc-mark,
+.soc-body,
+.soc-cta {
+  position: relative;
+  z-index: 1;
+  transform: translateZ(18px);
+}
+.soc-mark { transform: translateZ(34px); }
+
+.soc-mark {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--hue) 34%, transparent);
+  background: color-mix(in srgb, var(--hue) 12%, #05080f);
+  color: var(--hue);
+  transition: box-shadow 0.28s var(--ease);
+}
+.soc:hover .soc-mark { box-shadow: 0 0 22px -6px var(--hue); }
+
+.soc-body { display: block; }
+
+.soc-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text);
+}
+.soc-handle {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--hue);
+}
+.soc-blurb {
+  display: block;
+  margin-top: 10px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* Pushed to the bottom of the card, so the action row sits on one line across
+   all three however long the blurbs run. */
+.soc-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 4px;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+.soc-cta svg { transition: transform 0.28s var(--ease-out); }
+.soc:hover .soc-cta { color: var(--hue); }
+.soc:hover .soc-cta svg { transform: translateX(3px); }
+
+/* --------------------------------------------------------- responsive */
+
+/* On touch the transform would be driven by nothing and the depth offsets
+   would only blur the type, so the effect is switched off rather than left
+   inert. */
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .soc-stage { perspective: none; }
+  .soc { transform: none; }
+  .soc-gloss { display: none; }
+  .soc-mark,
+  .soc-body,
+  .soc-cta { transform: none; }
+}
+
+@media (max-width: 860px) {
+  .rack { grid-template-columns: 1fr; }
+  /* On one column a card does not need to be as tall as its neighbours, so the
+     action row comes back up against the text it belongs to. */
+  .soc-cta { margin-top: 0; }
+}

@@ -1,0 +1,206 @@
+/* ===========================================================================
+   KOVIID — site footer
+
+   Brand and responsible-gambling statement on the left, link columns on the
+   right, then the copyright and the two legal pages.
+
+   The disclaimer sits in the widest column at readable size rather than in the
+   bottom bar. Setting it at 11px next to a © line is a way of pretending to
+   say it.
+   =========================================================================== */
+
+.foot {
+  margin-top: clamp(40px, 6vw, 80px);
+  border-top: 1px solid var(--edge);
+  padding-block: clamp(32px, 4vw, 48px) 26px;
+  background: #03050b;
+}
+
+.foot-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
+}
+
+/* ------------------------------------------------------------- brand */
+
+.foot-brand { max-width: 52ch; }
+
+/* Block, not inline-block. Both this and the GambleAware mark below it are
+   links, and as inline boxes they shared a line and overlapped. */
+.foot-logo { display: block; width: fit-content; }
+.foot-logo img {
+  width: auto;
+  height: clamp(30px, 3.4vw, 40px);
+  /* Dimmed, not resized: the bloom competes with the type beside it at full
+     strength, but the mark needs its size to stay legible. */
+  opacity: 0.88;
+  transition: opacity 0.2s var(--ease);
+}
+.foot-logo:hover img { opacity: 1; }
+
+.foot-aware { display: block; width: fit-content; margin-top: 20px; }
+/* An alpha mask filled with the footer's text colour, not an image: the
+   supplied asset is near-black ink on transparent and would be invisible
+   here. This is the white-on-dark treatment. */
+.foot-aware-mark {
+  display: block;
+  width: 122px;
+  height: 18px;
+  background: var(--muted);
+  -webkit-mask: url("/gambleaware.png") left center / contain no-repeat;
+          mask: url("/gambleaware.png") left center / contain no-repeat;
+  opacity: 0.75;
+  transition: opacity 0.2s var(--ease);
+}
+.foot-aware:hover .foot-aware-mark { opacity: 1; }
+
+.foot-disclaimer {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--dim);
+}
+
+/* Duplicated against the "Social media" column on purpose: the column is for
+   someone reading the footer, the row for someone scanning it. */
+.foot-icons {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.foot-icons a {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--edge);
+  color: var(--dim);
+  transition:
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    background 0.2s var(--ease);
+}
+.foot-icons a:hover {
+  color: var(--blue-hot);
+  border-color: var(--edge-lit);
+  background: rgba(27, 132, 255, 0.08);
+}
+.foot-icons svg { width: 16px; height: 16px; }
+
+/* ------------------------------------------------------------- columns */
+
+.foot-nav {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: clamp(28px, 4vw, 64px);
+}
+
+.foot-col-head {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.foot-col ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.foot-col a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.18s var(--ease);
+}
+.foot-col a:hover { color: var(--text); }
+.foot-col a svg { flex: none; width: 15px; height: 15px; color: var(--dim); transition: color 0.18s var(--ease); }
+.foot-col a:hover svg { color: var(--blue-hot); }
+
+/* Not a link — the code is copied, not followed, so it must not look
+   clickable. */
+.foot-code {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--hue-gold);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------- independence */
+
+.foot-independent {
+  margin: clamp(28px, 4vw, 40px) 0 0;
+  max-width: 96ch;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--dim);
+}
+
+/* ------------------------------------------------------------- bottom bar */
+
+.foot-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--edge);
+}
+
+.foot-copy {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+.foot-legal {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.foot-legal a {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  transition: color 0.18s var(--ease);
+}
+.foot-legal a:hover { color: var(--text); }
+
+/* --------------------------------------------------------- responsive */
+
+@media (max-width: 1000px) {
+  .foot-top { grid-template-columns: 1fr; gap: 36px; }
+  .foot-brand { max-width: none; }
+  .foot-nav { justify-content: start; }
+}
+
+@media (max-width: 560px) {
+  .foot-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }
+  .foot-bar { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .foot-legal { gap: 18px; flex-wrap: wrap; }
+}

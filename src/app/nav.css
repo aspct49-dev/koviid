@@ -1,0 +1,98 @@
+/* ===========================================================================
+   KOVIID — top bar
+
+   Transparent over the hero, opaque once the page has moved. A filled bar from
+   the first pixel cuts the wordmark's bloom in half.
+   =========================================================================== */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid transparent;
+  transition:
+    background 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    backdrop-filter 0.25s var(--ease);
+}
+
+.nav[data-stuck] {
+  /* Not fully opaque, so the bar reads as glass over the page. */
+  background: rgba(4, 6, 13, 0.82);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+          backdrop-filter: blur(14px) saturate(1.3);
+  border-bottom-color: var(--edge);
+}
+
+/* Two elements now that the CTA has gone, so they take an end each and the
+   space between them is the gap. */
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 72px;
+}
+
+.nav-brand { flex: none; display: flex; align-items: center; }
+.nav-brand img {
+  width: auto;
+  height: 30px;
+  /* At this size the wordmark's own glow starts closing up its counters, so it
+     is held back slightly and brought to full on hover. */
+  opacity: 0.9;
+  transition: opacity 0.2s var(--ease);
+}
+.nav-brand:hover img { opacity: 1; }
+
+/* Wider gaps than before. The CTA used to sit against these and hold them in,
+   and without it the same spacing read as a cramped cluster pushed to one
+   side. */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 44px);
+}
+.nav-links a {
+  position: relative;
+  padding: 8px 0;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.18s var(--ease);
+}
+.nav-links a:hover { color: var(--text); }
+
+/* Grows from the middle out. A pseudo-element, not a border, so it animates
+   without shifting the link. */
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--blue);
+  box-shadow: 0 0 10px var(--blue);
+  transition: left 0.22s var(--ease-out), right 0.22s var(--ease-out);
+}
+.nav-links a:hover::after { left: 0; right: 0; }
+
+/* --------------------------------------------------------- responsive */
+
+@media (max-width: 720px) {
+  /* Tightened before they are dropped, so the links survive a few hundred more
+     pixels of width than they otherwise would. */
+  .nav-links { gap: 18px; }
+  .nav-links a { font-size: 13.5px; }
+}
+
+@media (max-width: 580px) {
+  /* The links drop out, not fold into a hamburger: every one is an anchor to a
+     section the visitor will reach by scrolling anyway. The wordmark stays. */
+  .nav-links { display: none; }
+  .nav-inner { height: 60px; }
+  .nav-brand img { height: 26px; }
+}

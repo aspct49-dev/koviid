@@ -1,0 +1,167 @@
+/* ===========================================================================
+   KOVIID — rewards
+
+   Two cards, each led by the figure that is the reason to read it. Same tilt,
+   specular and lit rim as the socials rack.
+   =========================================================================== */
+
+.rewards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* One perspective origin per card; see the note in socials.css. */
+.reward-stage { perspective: 1200px; overflow: visible; }
+
+.reward {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 18%;
+  --my: 0%;
+  --lift: 0;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: clamp(24px, 3vw, 34px);
+  border: 1px solid var(--edge);
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--hull) 0%, #05080f 100%);
+
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) translateZ(calc(var(--lift) * 12px));
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition:
+    transform 0.32s var(--ease-out),
+    border-color 0.28s var(--ease),
+    box-shadow 0.32s var(--ease);
+}
+
+.reward:hover {
+  transition:
+    transform 0.08s linear,
+    border-color 0.28s var(--ease),
+    box-shadow 0.32s var(--ease);
+  border-color: color-mix(in srgb, var(--blue) 50%, var(--edge));
+  box-shadow:
+    0 30px 70px -40px rgba(27, 132, 255, 0.7),
+    0 0 56px -26px rgba(27, 132, 255, 0.55),
+    0 20px 46px -30px rgba(0, 0, 0, 0.9);
+}
+
+/* Anchored to the corner the figure sits in, so the light appears to come off
+   the number rather than tinting the panel. */
+.reward::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(60% 70% at 12% 0%, var(--blue) 0%, transparent 66%);
+  opacity: 0.12;
+  transition: opacity 0.28s var(--ease);
+  pointer-events: none;
+}
+.reward:hover::before { opacity: 0.22; }
+
+.reward-gloss {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    38% 48% at var(--mx) var(--my),
+    rgba(255, 255, 255, 0.24) 0%,
+    rgba(255, 255, 255, 0.07) 40%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  opacity: var(--lift);
+  transition: opacity 0.3s var(--ease);
+  pointer-events: none;
+}
+
+.reward-figure,
+.reward-title,
+.reward-body,
+.reward-cta {
+  position: relative;
+  z-index: 1;
+  transform: translateZ(16px);
+}
+/* Furthest forward, because it is the thing the card is about. */
+.reward-figure { transform: translateZ(38px); }
+
+/* `$500` and `VIP` are set at one size. Scaling each to its own character
+   count would rank one above the other for a reason that has nothing to do
+   with what they say. */
+.reward-figure {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(42px, 6vw, 68px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(176deg, #ffffff 0%, var(--blue-hot) 36%, var(--blue) 74%, #0c5fd0 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  /* A drop-shadow filter, not a text-shadow: the glyph is transparent, so a
+     text-shadow would show through its own letterforms. */
+  filter: drop-shadow(0 3px 20px rgba(27, 132, 255, 0.45));
+}
+
+.reward-title {
+  display: block;
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: clamp(17px, 1.9vw, 20px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.reward-body {
+  display: block;
+  margin-top: 9px;
+  max-width: 46ch;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.reward-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 22px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.reward-cta svg { width: 15px; height: 15px; transition: transform 0.28s var(--ease-out); }
+.reward:hover .reward-cta { color: var(--blue-hot); }
+.reward:hover .reward-cta svg { transform: translateX(3px); }
+
+/* --------------------------------------------------------- responsive */
+
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .reward-stage { perspective: none; }
+  .reward { transform: none; }
+  .reward-gloss { display: none; }
+  .reward-figure,
+  .reward-title,
+  .reward-body,
+  .reward-cta { transform: none; }
+}
+
+@media (max-width: 760px) {
+  .rewards { grid-template-columns: 1fr; }
+  .reward-cta { margin-top: 0; }
+}

@@ -1,0 +1,212 @@
+/* ===========================================================================
+   KOVIID — the sections below the board
+
+   Last month's winners, how to enter, and the questions. Built out of the
+   furniture already on the page: the same rims, radii and rank colours.
+   =========================================================================== */
+
+/* ------------------------------------------------------- last month */
+
+/*
+ * Five rows, not ten. The settled board is evidence that the thing pays, and
+ * a few names answer that; ten would compete with the live board above it.
+ */
+.past { display: grid; gap: 6px; }
+
+.past-row {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr) 150px 110px;
+  align-items: center;
+  gap: 16px;
+  min-height: 58px;
+  padding: 0 20px;
+  border-radius: 14px;
+  border: 1px solid var(--edge);
+  background: linear-gradient(180deg, rgba(13, 20, 38, 0.5) 0%, rgba(5, 8, 15, 0.5) 100%);
+}
+.past-row[data-rank='1'] { border-color: color-mix(in srgb, var(--rank-1) 40%, var(--edge)); }
+.past-row[data-rank='2'] { border-color: color-mix(in srgb, var(--rank-2) 30%, var(--edge)); }
+.past-row[data-rank='3'] { border-color: color-mix(in srgb, var(--rank-3) 34%, var(--edge)); }
+
+.past-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+}
+.past-rank svg { flex: none; width: 14px; height: 14px; }
+.past-row[data-rank='1'] .past-rank { color: var(--rank-1); }
+.past-row[data-rank='2'] .past-rank { color: var(--rank-2); }
+.past-row[data-rank='3'] .past-rank { color: var(--rank-3); }
+
+.past-name {
+  min-width: 0;
+  font-weight: 600;
+  font-size: 14.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.past-wagered {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--dim);
+  text-align: right;
+}
+/* Paid, so green and not the rank colour: the rank is already on the left,
+   and repeating it here would say nothing new. */
+.past-prize {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  color: #3ddc97;
+  text-align: right;
+}
+
+/* --------------------------------------------------------- how to enter */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* The numeral is a low-contrast watermark, not a badge beside the heading:
+   a badge and a heading compete to be read first. */
+.step {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 24px;
+  border: 1px solid var(--edge);
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--hull) 0%, #05080f 100%);
+}
+.step::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(70% 80% at 100% 0%, rgba(27, 132, 255, 0.14) 0%, transparent 66%);
+  pointer-events: none;
+}
+.step-n {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  z-index: -1;
+  font-family: var(--font-display);
+  font-size: 92px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgba(27, 132, 255, 0.14);
+  pointer-events: none;
+}
+.step-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.step-body {
+  margin: 9px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.steps-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.steps-actions .btn svg { width: 16px; height: 16px; }
+
+/* ----------------------------------------------------------------- faq */
+
+.faq { display: grid; gap: 6px; }
+
+.faq-item {
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  background: linear-gradient(180deg, rgba(13, 20, 38, 0.5) 0%, rgba(5, 8, 15, 0.5) 100%);
+  transition: border-color 0.2s var(--ease);
+}
+.faq-item[open] { border-color: var(--edge-lit); }
+.faq-item:hover { border-color: var(--edge-lit); }
+
+.faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  list-style: none;
+}
+/* Safari still paints a disclosure triangle through `list-style: none`. */
+.faq-q::-webkit-details-marker { display: none; }
+
+/* Two borders on a rotated square: one element, no icon, and the open state
+   turns it without needing a second copy. */
+.faq-chevron {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-right: 4px;
+  border-right: 2px solid var(--blue);
+  border-bottom: 2px solid var(--blue);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.22s var(--ease-out);
+}
+.faq-item[open] .faq-chevron { transform: rotate(-135deg) translate(-2px, -2px); }
+
+.faq-a {
+  margin: 0;
+  padding: 0 20px 18px;
+  max-width: 78ch;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------- responsive */
+
+@media (max-width: 860px) {
+  .steps { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  /* Same treatment as the standings: the name and the prize are what a phone
+     reader scans for, and the wagered figure tucks under the prize rather
+     than off the page. */
+  .past-row {
+    grid-template-columns: 46px minmax(0, 1fr) auto;
+    gap: 2px 12px;
+    padding: 12px 16px;
+    min-height: 0;
+  }
+  .past-rank { grid-row: 1 / span 2; }
+  .past-name { grid-column: 2; grid-row: 1 / span 2; }
+  .past-wagered { grid-column: 3; grid-row: 1; font-size: 12.5px; }
+  .past-prize { grid-column: 3; grid-row: 2; font-size: 16px; }
+
+  .faq-q { font-size: 14.5px; padding: 15px 16px; }
+  .faq-a { padding: 0 16px 16px; }
+}

@@ -1,0 +1,308 @@
+/* ===========================================================================
+   KOVIID — design system
+
+   Taken from the logo: an electric blue neon wordmark on black. The page is
+   black rather than navy, and the blue is used as light (glows, lit rims,
+   gradients on type) rather than as fill.
+
+   The letterforms are round, so nothing here is chamfered or cut. Radii are
+   generous and rims are drawn as light.
+   =========================================================================== */
+
+:root {
+  /* Hull. Black at the bottom, with just enough blue mixed into the surfaces
+     above it to keep them from reading as grey. */
+  --void: #04060d;
+  --hull: #080c18;
+  --hull-2: #0d1426;
+  --edge: #16203a;
+  --edge-lit: #24365f;
+
+  /* Text. All three clear 4.5:1 on --void and --hull. */
+  --text: #e9f1ff;
+  --muted: #94a6c6;
+  --dim: #7a8da6;
+
+  /* The light. --blue is the tube, --blue-hot is the white-hot core the logo
+     has inside every stroke, --blue-deep is the colour it throws onto what is
+     behind it. */
+  --blue: #1b84ff;
+  --blue-hot: #7cc4ff;
+  --blue-deep: #0a4dad;
+
+  /* Blue already composited over --void, for opaque fills that have to sit on
+     top of the fixed background layer. */
+  --blue-quiet: #07142c;
+
+  /* Rank accents. Metal rather than blue: three shades of one hue would make
+     first, second and third a puzzle to read. Each is pulled slightly cool to
+     sit on this page, and each has a companion already composited over --void
+     for the opaque row fills on the standings table. */
+  --rank-1: #ffc95c;
+  --rank-1-quiet: #1a1509;
+  --rank-2: #cfe0f5;
+  --rank-2-quiet: #121722;
+  --rank-3: #e0854a;
+  --rank-3-quiet: #19110a;
+
+  /* Card hues for the socials rack. Three, and two of them sit inside the blue
+     family — the third is the green Kick owns, and borrowing it is the point. */
+  --hue-blue: #1b84ff;
+  --hue-ice: #63d2ff;
+  --hue-green: #53fc18;
+  --hue-gold: #e0b53f;
+
+  --r-sm: 10px;
+  --r: 14px;
+  --r-lg: 22px;
+
+  --gutter: 24px;
+
+  --font-display: var(--font-display-face), system-ui, sans-serif;
+  --font-sans: var(--font-sans-face), system-ui, -apple-system, sans-serif;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--void);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* A square grid over the black, drawn as one repeating gradient pair instead
+   of loaded as an image. Fixed, so it reads as a surface the content sits on.
+
+   Masked out toward the foot, where a ruled background would compete with the
+   real rows of the standings table. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(27, 132, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(27, 132, 255, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
+          mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
+}
+
+.shell { position: relative; z-index: 1; }
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+img { display: block; max-width: 100%; }
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* -------------------------------------------------------------- typography */
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.h-page { font-size: clamp(32px, 4.4vw, 46px); }
+.h-section { font-size: clamp(22px, 2.6vw, 30px); }
+
+.lede { color: var(--muted); font-size: 16.5px; max-width: 66ch; }
+
+/* -------------------------------------------------------------- layout */
+
+.wrap { width: 100%; max-width: 1160px; margin: 0 auto; padding-inline: var(--gutter); }
+
+.section { padding-block: 26px; }
+.section-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+.section-head p { margin: 0; color: var(--muted); font-size: 15px; }
+
+.card {
+  background: linear-gradient(180deg, var(--hull) 0%, #05080f 100%);
+  border: 1px solid var(--edge);
+  border-radius: var(--r-lg);
+  padding: clamp(20px, 3vw, 30px);
+}
+
+/* -------------------------------------------------------------- buttons
+
+   Lit slabs: a hairline top highlight, a solid darker lip below the face, and
+   a press that drops the face onto the lip. The lip is a darker version of the
+   button's own colour, since a black lip would vanish on a black page. */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 50px;
+  padding: 0 26px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    filter 0.14s var(--ease),
+    transform 0.08s var(--ease),
+    box-shadow 0.08s var(--ease),
+    border-color 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+.btn:hover { filter: brightness(1.08); }
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--blue-hot) 0%, var(--blue) 50%, #0f63d6 100%);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #02101f;
+  /* Two glow stops. One soft shadow reads as a drop shadow, not as emission. */
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
+    0 4px 0 var(--blue-deep),
+    0 8px 24px -6px rgba(27, 132, 255, 0.6),
+    0 0 44px -8px rgba(27, 132, 255, 0.45);
+}
+.btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.45), 0 1px 0 var(--blue-deep);
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, var(--hull-2) 0%, #080d1a 100%);
+  border-color: var(--edge-lit);
+  color: var(--text);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.1), 0 4px 0 #04070f;
+}
+.btn-sm { min-height: 40px; padding: 0 20px; font-size: 13.5px; gap: 7px; }
+.btn-sm svg { width: 14px; height: 14px; }
+
+.btn-secondary:hover { border-color: var(--blue-deep); }
+.btn-secondary:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.08), 0 1px 0 #04070f;
+}
+
+/* -------------------------------------------------------------- code chip */
+
+.code-copy {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 50px; padding: 0 20px;
+  background: linear-gradient(180deg, var(--hull-2) 0%, #080d1a 100%);
+  border: 1px solid var(--edge-lit);
+  border-radius: 999px;
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.1);
+  transition:
+    border-color 0.18s var(--ease),
+    filter 0.18s var(--ease),
+    transform 0.12s var(--ease),
+    box-shadow 0.18s var(--ease);
+}
+.code-copy:hover {
+  border-color: var(--blue);
+  filter: brightness(1.07);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.1), 0 0 26px -6px rgba(27, 132, 255, 0.55);
+}
+.code-copy:active { transform: translateY(1px); }
+.code-copy-key {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.code-copy-val {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--blue-hot);
+}
+.code-copy-state {
+  display: inline-flex; align-items: center; justify-content: flex-end;
+  font-size: 11px; color: var(--dim); min-width: 36px;
+}
+
+/* -------------------------------------------------------------- misc */
+
+.kv {
+  display: flex; justify-content: space-between; gap: 16px;
+  padding: 13px 0; border-bottom: 1px solid var(--edge); font-size: 14.5px;
+}
+.kv:last-child { border-bottom: 0; }
+.kv span { color: var(--dim); }
+.kv b { font-weight: 600; text-align: right; }
+
+/* Below this the two halves wrap and interleave, so which percentage belongs
+   to which band stops being obvious. Stacked, they stay paired. */
+@media (max-width: 560px) {
+  .kv { display: grid; gap: 3px; }
+  .kv b { text-align: left; }
+}
+
+.notice {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin: 0;
+  padding: 13px 15px;
+  border-radius: var(--r);
+  border: 1px solid var(--edge);
+  background: #05080f;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.notice-mark { color: var(--blue); flex: none; font-weight: 800; }
+
+/* -------------------------------------------------------------- footer */
+
+.foot {
+  margin-top: clamp(30px, 5vw, 56px);
+  border-top: 1px solid var(--edge);
+  padding-block: 30px 40px;
+  background: #03050b;
+}
+.foot-inner { display: grid; gap: 12px; }
+.foot-line { margin: 0; max-width: 88ch; color: var(--dim); font-size: 13px; line-height: 1.6; }
+.foot-meta {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+}
