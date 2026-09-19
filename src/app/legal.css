@@ -128,17 +128,4 @@
   color: var(--text);
 }
 
-/* Still needs the operator's own details. A visible block, not a code
-   comment: the person who has to fill these in is reading the page, not the
-   repository. */
-.legal-todo {
-  margin-top: 16px !important;
-  padding: 14px 16px;
-  border: 1px dashed var(--edge-lit);
-  border-radius: var(--r);
-  background: rgba(27, 132, 255, 0.05);
-  font-size: 14px !important;
-  color: var(--muted) !important;
-}
-
 .legal-return { margin-top: clamp(34px, 4.4vw, 52px); }

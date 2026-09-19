@@ -18,17 +18,53 @@ For a production build:
 npm run build && npm start
 ```
 
+## Deploying to Vercel
+
+1. In Vercel, **Add New → Project** and import `aspct49-dev/koviid`. The
+   framework is detected automatically; the build command and output directory
+   need no changes.
+
+2. Add the environment variables below under **Settings → Environment
+   Variables**, ticking Production, Preview and Development for each. The
+   build will succeed without them, but the board will render every seat as
+   unclaimed with a "feed unavailable" notice, because the provider throws when
+   the credentials are missing.
+
+   | Variable               | Value                                                |
+   | ---------------------- | ---------------------------------------------------- |
+   | `ROOBET_API_KEY`       | The affiliate bearer token.                            |
+   | `ROOBET_USER_ID`       | The `id` claim inside that token's JWT payload.        |
+   | `NEXT_PUBLIC_SITE_URL` | Your final origin, e.g. `https://koviid.com`. Optional. |
+
+   `NEXT_PUBLIC_SITE_URL` only affects canonical URLs, the sitemap and the
+   OpenGraph tags. Left unset, the site falls back to Vercel's own production
+   hostname, which is correct but not the domain you want indexed — so set it
+   once your domain is attached.
+
+3. Deploy. Then attach your domain under **Settings → Domains** and set
+   `NEXT_PUBLIC_SITE_URL` to match.
+
+`.env.local` is gitignored and must never be committed. Vercel reads the values
+from its own store, not from the repository.
+
+### After the first deploy
+
+- Open `/robots.txt` and `/sitemap.xml` and check the URLs point at your domain
+  rather than a `*.vercel.app` hostname. If they do not, `NEXT_PUBLIC_SITE_URL`
+  is unset or misspelt.
+- The leaderboard page revalidates every 60 seconds, so the first load after a
+  deploy is the slow one and everything after it is served from the cache.
+
 ## Environment
 
-| Variable               | What it is                                                                   |
-| ---------------------- | ---------------------------------------------------------------------------- |
-| `ROOBET_API_KEY`       | Bearer token issued with the affiliate account.                                |
-| `ROOBET_USER_ID`       | The `id` claim inside that key's JWT payload. The two must match.              |
-| `NEXT_PUBLIC_SITE_URL` | Canonical origin, e.g. `https://koviid.com`. Used for metadata and the schema. |
+The three variables are listed under **Deploying to Vercel** above. Locally
+they live in `.env.local`, copied from `.env.example`.
 
-`ROOBET_API_KEY` is read only in `src/lib/providers/roobet.ts`, which is
-`server-only` — the key never reaches the browser, and nothing under
-`src/components` may import it.
+`ROOBET_API_KEY` is read only in `src/lib/providers/roobet.ts`, which is marked
+`server-only`: the key never reaches the browser, and nothing under
+`src/components` is allowed to import that module. `ROOBET_USER_ID` is the `id`
+claim inside the key's own JWT payload, so the two always belong to the same
+affiliate account.
 
 ## Changing the prizes
 
@@ -79,16 +115,29 @@ request a minute reaches Roobet however much traffic arrives.
 ```
 src/
   app/
-    page.tsx          the leaderboard, which is the whole site
-    layout.tsx        fonts, metadata, JSON-LD
+    page.tsx          the leaderboard, which is the main page
+    layout.tsx        fonts, metadata, JSON-LD, stylesheet imports
+    terms/            terms of service
+    privacy/          privacy policy
+    robots.ts         robots.txt, generated
+    sitemap.ts        sitemap.xml, generated
     globals.css       design tokens, buttons, shared furniture
-    leaderboard.css   podium, standings, countdown, rules
-    socials.css       the rack at the foot of the page
-  components/         Podium, Board, Countdown, CopyCode, FeedState, Socials
+    nav.css           the top bar
+    leaderboard.css   hero, podium, standings, countdown, rules
+    rewards.css       the two reward cards
+    sections.css      last month, how to enter, FAQ
+    socials.css       the rack above the footer
+    footer.css        the footer
+    legal.css         long-form prose for terms and privacy
+  components/         SiteNav, Podium, Board, Rewards, Faq, Socials, SiteFooter,
+                      TiltCard, Countdown, CopyCode, FeedState, icons
   lib/                types, formatting, partner config, provider, service
 brand/                the untrimmed source logo (not served)
-public/               trimmed wordmark, favicon, operator marks
+public/               wordmark, favicon, GambleAware and operator marks
 ```
+
+Every stylesheet is imported once in `layout.tsx`; a new one has to be added
+there or it will not load.
 
 ## Design
 
@@ -101,3 +150,17 @@ The podium is the one exception to the blue: first, second and third are gold,
 silver and bronze. It is the single place in the palette where a convention
 carries meaning the brand colour cannot — three shades of the same blue would
 make the podium a puzzle to read.
+
+## Contact channels
+
+Prize claims, VIP transfer requests and data requests all route to the Discord
+ticket system, with X as the shorter alternative. Both the terms and the privacy
+policy link there, and the invite is a single constant:
+
+```ts
+// src/lib/partners.ts
+export const DISCORD_INVITE = 'https://discord.gg/ngY3Ps9mW3';
+```
+
+Changing it there changes the reward card, the socials rack, the footer and both
+legal pages at once.

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { LegalPage } from '@/components/LegalPage';
 import { formatMoney } from '@/lib/format';
-import { PRIMARY_PARTNER } from '@/lib/partners';
+import { DISCORD_INVITE, PRIMARY_PARTNER } from '@/lib/partners';
 import { SITE } from '@/lib/site';
 import { pageMeta } from '@/lib/site';
 
@@ -138,8 +138,12 @@ export default function TermsPage() {
             closed. Prizes are issued after that verification.
           </li>
           <li>
-            To claim, contact us through one of the channels listed on the site with your{' '}
-            {PRIMARY_PARTNER.name} username. We may ask you to confirm ownership of the account.
+            To claim, open a ticket in the{' '}
+            <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
+              Discord
+            </a>{' '}
+            with your {PRIMARY_PARTNER.name} username. We may ask you to confirm ownership of the
+            account.
           </li>
           <li>
             An unclaimed prize may be forfeited if we cannot reach you or you do not respond within
@@ -237,16 +241,26 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2>11. Contact and governing law</h2>
+        <h2>11. Contact</h2>
         <p>
-          Questions about these terms, or about a prize, can be sent through any of the channels
-          listed in the footer of this site.
+          The quickest way to reach us is the{' '}
+          <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
+            Discord
+          </a>
+          , where you can open a ticket. Prize claims, VIP transfer requests and anything disputed
+          about a placing should go there, because a ticket keeps the whole exchange in one place
+          and can be picked up by whoever is around.
         </p>
-        <p className="legal-todo">
-          <b>To be completed:</b> the operating entity or individual behind {SITE.name}, a contact
-          email address, and the country whose law governs these terms and whose courts have
-          jurisdiction. These depend on where you are based and should be filled in before the site
-          goes live.
+        <p>
+          For anything shorter, message{' '}
+          <a href="https://x.com/koviid" target="_blank" rel="noreferrer">
+            @koviid on X
+          </a>{' '}
+          or say so in chat on{' '}
+          <a href="https://kick.com/koviid" target="_blank" rel="noreferrer">
+            Kick
+          </a>
+          .
         </p>
       </section>
     </LegalPage>

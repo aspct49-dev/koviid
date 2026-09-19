@@ -119,7 +119,7 @@ export const FAQ = [
   },
   {
     q: 'When does the board settle, and when do I get paid?',
-    a: `The board closes at 23:59:59 UTC on the last day of the month. Once it has fully closed, the standings are checked against the affiliate stats and prizes go out after that. To claim, message us on one of the accounts listed in the footer with your Roobet username.`,
+    a: `The board closes at 23:59:59 UTC on the last day of the month. Once it has fully closed, the standings are checked against the affiliate stats and prizes go out after that. To claim, open a ticket in the Discord with your Roobet username.`,
   },
   {
     q: 'Do I have to sign up again if I already have a Roobet account?',

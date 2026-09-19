@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { LegalPage } from '@/components/LegalPage';
-import { PRIMARY_PARTNER } from '@/lib/partners';
+import { DISCORD_INVITE, PRIMARY_PARTNER } from '@/lib/partners';
 import { SITE, pageMeta } from '@/lib/site';
 
 export const metadata: Metadata = pageMeta({
@@ -85,10 +85,10 @@ export default function PrivacyPage() {
       <section>
         <h2>5. If you contact us</h2>
         <p>
-          If you message us to claim a prize or ask a question, through the social accounts listed in
-          the footer, we will hold that conversation and whatever you tell us in it, such as
-          your {PRIMARY_PARTNER.name} username, for as long as is needed to deal with it and to keep
-          a record of prizes paid. Those conversations take place on the relevant platform and are
+          If you open a ticket in the Discord or message us on X to claim a prize or ask a question,
+          we will hold that conversation and whatever you tell us in it, such as your{' '}
+          {PRIMARY_PARTNER.name} username, for as long as is needed to deal with it and to keep a
+          record of prizes paid. Those conversations take place on the relevant platform and are
           also subject to that platform&rsquo;s own privacy policy.
         </p>
       </section>
@@ -106,9 +106,9 @@ export default function PrivacyPage() {
             section 2.
           </li>
           <li>
-            <b>Kick and X</b> are linked from the footer. Following a link takes you to them and puts
-            you under their policies. We receive nothing from those links beyond the fact that a
-            page on this site was loaded.
+            <b>Discord, Kick and X</b> are linked from the footer. Following a link takes you to
+            them and puts you under their policies. We receive nothing from those links beyond the
+            fact that a page on this site was loaded.
           </li>
         </ul>
       </section>
@@ -159,11 +159,17 @@ export default function PrivacyPage() {
           If this policy changes, the date at the top of this page changes with it. Material changes
           will be noted on the site.
         </p>
-        <p className="legal-todo">
-          <b>To be completed:</b> the data controller&rsquo;s name and address, a contact email
-          address for privacy requests, and the hosting provider you deploy to. If you later add
-          analytics, update section 3 at the same time. These should be filled in before the site
-          goes live.
+        <p>
+          To ask what we hold, to have something corrected or deleted, or to be taken off the public
+          board, open a ticket in the{' '}
+          <a href={DISCORD_INVITE} target="_blank" rel="noreferrer">
+            Discord
+          </a>{' '}
+          or message{' '}
+          <a href="https://x.com/koviid" target="_blank" rel="noreferrer">
+            @koviid on X
+          </a>
+          . Say which request you are making and we will deal with it.
         </p>
       </section>
     </LegalPage>
