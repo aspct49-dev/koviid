@@ -11,7 +11,7 @@ import { Podium } from '@/components/Podium';
 import { Socials } from '@/components/Socials';
 import { ExternalIcon, ShieldIcon } from '@/components/icons';
 import { currentPeriod, formatMoney, periodLabel, previousPeriod } from '@/lib/format';
-import { FAIR_PLAY, PRIMARY_PARTNER, WAGER_NOTE, WAGER_WEIGHTS } from '@/lib/partners';
+import { FAIR_PLAY, PRIMARY_PARTNER, WAGER_FACTS, WAGER_NOTE } from '@/lib/partners';
 import { pageMeta } from '@/lib/site';
 import { getLeaderboard } from '@/lib/services/leaderboard';
 
@@ -114,15 +114,15 @@ export default async function LeaderboardPage() {
         <div className="rules card" id="wager-rules">
           <h2 className="h-section">Wager Rules</h2>
           <p className="lede" style={{ marginTop: 12 }}>
-            {WAGER_NOTE} Every game counts toward the board, dice included, but not every game counts
-            the same:
+            {WAGER_NOTE} The board is ranked on the raw figure, so nothing is discounted for being
+            low-edge and nothing is excluded.
           </p>
 
           <div style={{ marginTop: 16 }}>
-            {WAGER_WEIGHTS.map((w) => (
-              <div className="kv" key={w.band}>
-                <span>{w.band}</span>
-                <b>{w.weight} of wager counted</b>
+            {WAGER_FACTS.map((f) => (
+              <div className="kv" key={f.k}>
+                <span>{f.k}</span>
+                <b>{f.v}</b>
               </div>
             ))}
           </div>

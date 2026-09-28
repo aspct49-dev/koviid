@@ -33,13 +33,13 @@ export const SITE = {
   locale: 'en_US',
   tagline: 'The monthly Roobet wager leaderboard for the Koviid community.',
   description:
-    'Ten paying places on the monthly Roobet wager leaderboard, ranked on weighted wager and settled at the end of every month. Play under code koviid to enter.',
+    'Ten paying places on the monthly Roobet wager leaderboard, ranked on total amount wagered and settled at the end of every month. Play under code koviid to enter.',
 };
 
 export const SOCIAL_PROFILES = [
   'https://x.com/koviid',
   'https://kick.com/koviid',
-  'https://discord.gg/ngY3Ps9mW3',
+  'https://discord.gg/GDrPqTeCyQ',
 ];
 
 /** Per-page metadata that inherits the defaults set in the root layout. */

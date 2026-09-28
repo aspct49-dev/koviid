@@ -1,8 +1,7 @@
 # Koviid — monthly Roobet leaderboard
 
 A single page: the $500 monthly wager leaderboard for the Koviid community,
-ranked on Roobet's weighted wager figure and settled at the end of each
-calendar month.
+ranked on total amount wagered and settled at the end of each calendar month.
 
 ## Running it
 
@@ -95,10 +94,11 @@ page.tsx
 
 Three things worth knowing:
 
-- **The ranked figure is `weightedWagered`, not `wagered`.** Roobet weights by
-  house edge so low-edge grinding cannot farm a board, and the published rules
-  on the page rank on the weighted figure. The raw figure is deliberately never
-  shown — showing both invites the question of which one pays.
+- **The ranked figure is `wagered`, the raw stake.** The feed also returns
+  `weightedWagered`, Roobet's RTP-discounted number, which this board does not
+  use and does not display: publishing both would invite the question of which
+  one pays. Switching back is a one-line change in `ranked()` plus the copy in
+  `WAGER_FACTS`, `WAGER_NOTE` and the terms.
 - **Usernames are masked in `buildEntries`**, not in the provider, so a second
   integration cannot forget to do it.
 - **A failed fetch serves an empty board, never sample rows.** A hardcoded row
@@ -159,7 +159,7 @@ policy link there, and the invite is a single constant:
 
 ```ts
 // src/lib/partners.ts
-export const DISCORD_INVITE = 'https://discord.gg/ngY3Ps9mW3';
+export const DISCORD_INVITE = 'https://discord.gg/GDrPqTeCyQ';
 ```
 
 Changing it there changes the reward card, the socials rack, the footer and both

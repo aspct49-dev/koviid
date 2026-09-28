@@ -66,10 +66,10 @@ export default function PrivacyPage() {
           The standings do not come from you. They come from {PRIMARY_PARTNER.name}&rsquo;s
           affiliate API, which reports aggregate wager statistics for players who signed up under
           the code <b>{PRIMARY_PARTNER.code}</b>. For each player that feed gives us a username, an
-          account identifier, a wagered total and a weighted wagered total.
+          account identifier, and their wagered totals.
         </p>
         <p>
-          We publish only a <b>partially masked username</b> and the weighted wagered figure.
+          We publish only a <b>partially masked username</b> and the amount wagered.
           Usernames are masked to their last four characters before they reach the page, and the
           account identifier is never displayed. We do not receive, and cannot see, your real name,
           your email address, your location, your balance, your deposits, your withdrawals or your

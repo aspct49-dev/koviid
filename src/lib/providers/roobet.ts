@@ -16,11 +16,11 @@ import type { Leaderboard, LeaderboardProvider, Period } from '../types';
  *   1. It is date-ranged, unlike most affiliate feeds — startDate and endDate
  *      are required and are read as UTC. The period we ask for is therefore
  *      the period we display, and the two cannot drift.
- *   2. It returns both `wagered` and `weightedWagered`. Roobet weights by house
- *      edge to stop low-edge grinding from farming a board, and the published
- *      rules rank on the weighted figure, so that is the one used here. The raw
- *      figure is deliberately not shown, because showing both invites the
- *      question of which one pays.
+ *   2. It returns both `wagered` and `weightedWagered`. This board ranks on
+ *      `wagered`, the raw figure, so a dollar counts the same whatever it was
+ *      staked on. `weightedWagered` is Roobet's own RTP-discounted number and
+ *      is deliberately neither used nor shown: publishing both would invite
+ *      the question of which one pays.
  */
 
 /** The fields we use out of a Roobet stats row. */
@@ -28,7 +28,6 @@ interface RoobetRow {
   uid: string;
   username: string;
   wagered: number;
-  weightedWagered?: number;
   favoriteGameTitle?: string;
 }
 
@@ -47,9 +46,9 @@ function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** The figure the board ranks on. Falls back to raw if a row omits the weight. */
+/** The figure the board ranks on: total staked, at face value. */
 function ranked(row: RoobetRow): number {
-  return row.weightedWagered ?? row.wagered ?? 0;
+  return row.wagered ?? 0;
 }
 
 export const roobetProvider: LeaderboardProvider = {

@@ -67,11 +67,11 @@ export default function TermsPage() {
           ending at 23:59:59 UTC on the last day.
         </p>
         <p>
-          Players are ranked on <b>weighted amount wagered</b>, not on raw amount wagered.{' '}
-          {PRIMARY_PARTNER.name} discounts each bet according to the game&rsquo;s RTP, and we use
-          the weighted figure their affiliate API reports. The weighting bands are published on the
-          leaderboard page. We do not set them, we cannot change them, and we do not apply any
-          weighting of our own on top.
+          Players are ranked on <b>total amount wagered</b>, at face value. Every bet counts for
+          what it was staked, whatever game it was placed on, and no discount is applied for a
+          game&rsquo;s RTP or house edge. The figure we rank on is the total wagered amount that{' '}
+          {PRIMARY_PARTNER.name}&rsquo;s affiliate API reports, and we apply no weighting of our
+          own on top of it.
         </p>
         <p>
           The prize pool is {formatMoney(PRIMARY_PARTNER.prizePool)}, paid across{' '}
@@ -107,8 +107,9 @@ export default function TermsPage() {
           </li>
           <li>
             <b>Wager abuse.</b> Wagering designed to inflate a leaderboard figure rather than to
-            play: low-edge cycling, matched or hedged betting across games or accounts, and any
-            activity {PRIMARY_PARTNER.name} identifies as bonus or promotion abuse.
+            play. Choosing a low-edge game is not abuse and counts in full; matched or hedged
+            betting that covers both sides of an outcome, stakes cycled between accounts, and any
+            activity {PRIMARY_PARTNER.name} identifies as bonus or promotion abuse are.
           </li>
           <li>
             Any breach of {PRIMARY_PARTNER.name}&rsquo;s own terms of service that results in
