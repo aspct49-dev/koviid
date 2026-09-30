@@ -15,7 +15,8 @@ import type { Leaderboard, LeaderboardProvider, Period } from '../types';
  *
  *   1. It is date-ranged, unlike most affiliate feeds — startDate and endDate
  *      are required and are read as UTC. The period we ask for is therefore
- *      the period we display, and the two cannot drift.
+ *      the period we display, and the two cannot drift. See `isoDate` and
+ *      `exclusiveEnd` for the half-open window this endpoint actually uses.
  *   2. It returns both `wagered` and `weightedWagered`. This board ranks on
  *      `wagered`, the raw figure, so a dollar counts the same whatever it was
  *      staked on. `weightedWagered` is Roobet's own RTP-discounted number and
@@ -46,6 +47,26 @@ function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+/**
+ * The upper bound to send, which is the day *after* the period ends.
+ *
+ * Roobet's window is half-open: `startDate` is inclusive but `endDate` means
+ * "up to 00:00 on this date" and excludes the day itself. Sending the last day
+ * of the month therefore threw away that entire day's wagering — silently, and
+ * on the one day of the month when it matters most, because the board settles
+ * that night.
+ *
+ * Verified against a live account: a player with $374.22 for September came
+ * back as $15.45 with `endDate=2026-09-30` and as the full $374.22 with
+ * `2026-10-01`, the difference being everything they staked on the 30th.
+ *
+ * `period.end` is 23:59:59 on the last day, so a second past it lands at 00:00
+ * the next day and `isoDate` rounds to exactly the bound this endpoint wants.
+ */
+function exclusiveEnd(d: Date): string {
+  return isoDate(new Date(d.getTime() + 1000));
+}
+
 /** The figure the board ranks on: total staked, at face value. */
 function ranked(row: RoobetRow): number {
   return row.wagered ?? 0;
@@ -61,7 +82,7 @@ export const roobetProvider: LeaderboardProvider = {
     const url = new URL(ENDPOINT);
     url.searchParams.set('userId', userId);
     url.searchParams.set('startDate', isoDate(period.start));
-    url.searchParams.set('endDate', isoDate(period.end));
+    url.searchParams.set('endDate', exclusiveEnd(period.end));
 
     const res = await fetch(url, {
       headers: { accept: 'application/json', authorization: `Bearer ${token}` },
