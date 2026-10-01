@@ -17,11 +17,11 @@ import type { Leaderboard, LeaderboardProvider, Period } from '../types';
  *      are required and are read as UTC. The period we ask for is therefore
  *      the period we display, and the two cannot drift. See `isoDate` and
  *      `exclusiveEnd` for the half-open window this endpoint actually uses.
- *   2. It returns both `wagered` and `weightedWagered`. This board ranks on
- *      `wagered`, the raw figure, so a dollar counts the same whatever it was
- *      staked on. `weightedWagered` is Roobet's own RTP-discounted number and
- *      is deliberately neither used nor shown: publishing both would invite
- *      the question of which one pays.
+ *   2. It returns both `wagered` and `weightedWagered`. Roobet weights by RTP
+ *      to stop low-edge grinding from farming a board, and the published rules
+ *      rank on the weighted figure, so that is the one used here. The raw
+ *      figure is deliberately not shown, because showing both invites the
+ *      question of which one pays.
  */
 
 /** The fields we use out of a Roobet stats row. */
@@ -29,6 +29,7 @@ interface RoobetRow {
   uid: string;
   username: string;
   wagered: number;
+  weightedWagered?: number;
   favoriteGameTitle?: string;
 }
 
@@ -67,9 +68,15 @@ function exclusiveEnd(d: Date): string {
   return isoDate(new Date(d.getTime() + 1000));
 }
 
-/** The figure the board ranks on: total staked, at face value. */
+/**
+ * The figure the board ranks on, displays and totals.
+ *
+ * Falls back to the raw stake only where a row omits the weight: a row with no
+ * weighted figure is better ranked on what it does carry than dropped to zero.
+ * Every live row carries one.
+ */
 function ranked(row: RoobetRow): number {
-  return row.wagered ?? 0;
+  return row.weightedWagered ?? row.wagered ?? 0;
 }
 
 export const roobetProvider: LeaderboardProvider = {

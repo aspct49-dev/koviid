@@ -1,7 +1,7 @@
 # Koviid — monthly Roobet leaderboard
 
 A single page: the $500 monthly wager leaderboard for the Koviid community,
-ranked on total amount wagered and settled at the end of each calendar month.
+ranked on Roobet's weighted wager and settled at the end of each calendar month.
 
 ## Running it
 
@@ -94,11 +94,13 @@ page.tsx
 
 Three things worth knowing:
 
-- **The ranked figure is `wagered`, the raw stake.** The feed also returns
-  `weightedWagered`, Roobet's RTP-discounted number, which this board does not
-  use and does not display: publishing both would invite the question of which
-  one pays. Switching back is a one-line change in `ranked()` plus the copy in
-  `WAGER_FACTS`, `WAGER_NOTE` and the terms.
+- **The ranked figure is `weightedWagered`**, Roobet's RTP-discounted number
+  (2026-10-01, replacing the raw stake). Roobet counts a bet in full up to 97%
+  RTP, at 50% to 98.99%, and at 10% above that, so a dollar through dice moves
+  the board a tenth as far as a dollar through slots. The raw figure is not
+  displayed: publishing both would invite the question of which one pays. The
+  bands are in `WAGER_WEIGHTS` and rendered on the page; `ranked()` is the only
+  place the choice is made.
 - **Usernames are masked in `buildEntries`**, not in the provider, so a second
   integration cannot forget to do it.
 - **A failed fetch serves an empty board, never sample rows.** A hardcoded row

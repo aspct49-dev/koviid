@@ -31,7 +31,7 @@ export function Board({ board }: { board: Leaderboard }) {
       <div className="board-head" role="presentation">
         <span>Rank</span>
         <span>Player</span>
-        <span>Wagered</span>
+        <span>Weighted</span>
         <span>Prize</span>
       </div>
 

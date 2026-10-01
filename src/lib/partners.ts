@@ -24,9 +24,9 @@ export const PARTNERS: Record<PartnerId, Partner> = {
     signupUrl: 'https://roobet.com/?ref=koviid',
     prizePool: ROOBET_PRIZES.reduce((sum, n) => sum + n, 0),
     prizeTable: ROOBET_PRIZES,
-    // Raw stake, not Roobet's RTP-weighted figure: a dollar counts the same
-    // whatever it was played on.
-    metricLabel: 'Amount wagered',
+    // Roobet weights wagers by game to stop low-edge grinding from farming the
+    // board, so the ranked figure is the weighted one, not the raw stake.
+    metricLabel: 'Weighted amount wagered',
   },
 };
 
@@ -46,22 +46,25 @@ export function getPartner(id: PartnerId): Partner {
 export const PRIMARY_PARTNER = PARTNERS.roobet;
 
 /**
- * How the board is scored, as plain facts.
+ * How much of a wager counts toward the board.
  *
- * This replaced a table of Roobet's RTP weighting bands, which described a
- * rule the board no longer follows: the ranking is on raw wager, so quoting
- * their discount rates here would have stated the opposite of what happens.
+ * Roobet's own bands, reproduced here verbatim in meaning — the site must not
+ * paraphrase a rule it does not set. Banded on **RTP**, not house edge: the two
+ * are inverses, and quoting the wrong one is exactly the kind of small error
+ * that reads as the board being rigged.
+ *
+ * Every game counts for something under these bands, dice included. If Roobet
+ * changes them, this array is the only place to edit.
  */
-export const WAGER_FACTS = [
-  { k: 'Ranked on', v: 'Total amount wagered' },
-  { k: 'Games that count', v: 'All of them, at face value' },
-  { k: 'Period', v: '1st to the last day of the month, UTC' },
-  { k: 'Paying places', v: 'Ten' },
+export const WAGER_WEIGHTS = [
+  { band: 'RTP of 97% or lower', weight: '100%', note: 'Most slots and the bulk of the lobby' },
+  { band: 'RTP between 97.01% and 98.99%', weight: '50%', note: 'Higher-RTP slots and table games' },
+  { band: 'RTP of 99% and over', weight: '10%', note: 'Dice and the lowest-edge originals' },
 ];
 
-/** The one caveat left once the weighting is gone: the feed is not instant. */
+/** Roobet's wording, kept close to theirs because it is their rule. */
 export const WAGER_NOTE =
-  'Every wager counts at face value, whatever you are playing on. A dollar through dice counts exactly as much as a dollar through slots.';
+  'Leaderboard wager amounts may differ from your statistics on Roobet, depending on the games you are playing.';
 
 /**
  * The two ways a player gets removed from the board, stated as rules rather
@@ -77,7 +80,7 @@ export const FAIR_PLAY = [
   {
     id: 'abuse',
     title: 'No wager abuse',
-    body: `Grinding a low-edge game is fine and counts in full. What does not count is wagering that is not really play: matched or hedged betting that covers both sides of an outcome, stakes cycled between accounts, and anything Roobet flags as bonus or promotion abuse.`,
+    body: `Wagering meant to inflate a figure, not to play, does not count. That covers low-edge cycling, matched or hedged betting across games, and anything Roobet flags as bonus or promotion abuse.`,
   },
 ];
 
@@ -96,7 +99,7 @@ export const JOIN_STEPS = [
   {
     n: 3,
     title: 'Start wagering',
-    body: 'Every dollar you stake from that point counts. The board updates through the month and settles when it ends.',
+    body: 'Every weighted dollar from that point counts. The board updates through the month and settles when it ends.',
   },
 ] as const;
 
@@ -111,8 +114,8 @@ export const JOIN_STEPS = [
  */
 export const FAQ = [
   {
-    q: 'Does the figure here match my Roobet statistics?',
-    a: `It should. The board ranks on total amount wagered at face value, which is the same number Roobet shows you, with no discount applied for the game you played it on. The standings refresh about once a minute, so a bet you have just placed can take a moment to appear.`
+    q: 'Why is my wagered figure here lower than on Roobet?',
+    a: `Because the board ranks on weighted wager rather than raw wager. Roobet discounts every bet by the game's RTP: the higher the RTP, the less of that bet counts. A month spent on dice therefore contributes far less than the same money put through slots. The bands are in the table above. The standings also refresh about once a minute, so a bet you have just placed can take a moment to appear.`
   },
   {
     q: 'When does the board settle, and when do I get paid?',
@@ -123,8 +126,8 @@ export const FAQ = [
     a: `The code has to be on the account for its wagers to reach the affiliate stats, and it is applied at signup. An existing account that was not opened under the code will not appear here. Roobet does not attach a referral retroactively.`,
   },
   {
-    q: 'Does every game count the same?',
-    a: `Yes. Slots, originals, crash, table games and sports all count at face value, and nothing is weighted down for being low-edge. The only thing that moves you up the board is how much you put through it.`,
+    q: 'Does every game count?',
+    a: `Yes. Slots, originals, crash, table games and sports all count, at the rate their RTP band sets and not at face value. Nothing is excluded outright.`,
   },
   {
     q: 'What happens if someone above me is disqualified?',
@@ -221,7 +224,7 @@ export const REWARDS = [
     id: 'leaderboard',
     figure: `$${ROOBET_PRIZES.reduce((s, n) => s + n, 0)}`,
     title: 'Monthly leaderboard',
-    body: `Ten paying places every month, ranked on total amount wagered. Play under code ${PARTNERS.roobet.code} and you are on the board. There is nothing to opt into.`,
+    body: `Ten paying places every month, ranked on weighted wager. Play under code ${PARTNERS.roobet.code} and you are on the board. There is nothing to opt into.`,
     href: '#standings',
     cta: 'See the board',
     external: false,

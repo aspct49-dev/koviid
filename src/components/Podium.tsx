@@ -70,7 +70,7 @@ function PodiumCard({
 
           <p className="pod-name">{open ? 'Open seat' : entry.username}</p>
 
-          <p className="pod-metric">Wagered</p>
+          <p className="pod-metric">Weighted</p>
           <p className="pod-wagered">
             <span className="sym">$</span>
             {(open ? 0 : entry.wagered).toLocaleString('en-US', {
