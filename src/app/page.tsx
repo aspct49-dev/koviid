@@ -8,6 +8,7 @@ import { HowToEnter } from '@/components/HowToEnter';
 import { PastWinners } from '@/components/PastWinners';
 import { Rewards } from '@/components/Rewards';
 import { Podium } from '@/components/Podium';
+import { RankModeProvider, RankSwitch } from '@/components/RankMode';
 import { Socials } from '@/components/Socials';
 import { ExternalIcon, ShieldIcon } from '@/components/icons';
 import { currentPeriod, formatMoney, periodLabel, previousPeriod } from '@/lib/format';
@@ -33,7 +34,7 @@ export default async function LeaderboardPage() {
   ]);
 
   return (
-    <>
+    <RankModeProvider>
       {/*
        * The wordmark, whose board it is, the offer as one headline, the terms
        * in a line, and the two things to do — then the top three. The order is
@@ -101,10 +102,14 @@ export default async function LeaderboardPage() {
         <div className="section-head">
           <h2 className="h-section">Standings</h2>
           <p>
-            {periodLabel(board.periodStart)} · ten paying places · ranked on{' '}
-            {PRIMARY_PARTNER.metricLabel.toLowerCase()}
+            {periodLabel(board.periodStart)} · {PRIMARY_PARTNER.prizeTable.length} paying places
           </p>
         </div>
+
+        {/* The switch sits with the table rather than with the podium, because
+            this is where someone is reading figures closely enough to want the
+            other measure. It governs both. */}
+        <RankSwitch />
 
         <Board board={board} />
         <BoardStats board={board} />
@@ -114,15 +119,19 @@ export default async function LeaderboardPage() {
         <div className="rules card" id="wager-rules">
           <h2 className="h-section">Wager Rules</h2>
           <p className="lede" style={{ marginTop: 12 }}>
-            {WAGER_NOTE} Every game counts toward the board, dice included, but not every game
-            counts the same:
+            {WAGER_NOTE}
+          </p>
+          <p className="lede" style={{ marginTop: 10 }}>
+            The standings above can also be viewed weighted, which is {PRIMARY_PARTNER.name}
+            &rsquo;s own measure: each bet discounted by the RTP of the game it was placed on.
+            That view is there for comparison and does not decide prizes. Their bands:
           </p>
 
           <div style={{ marginTop: 16 }}>
             {WAGER_WEIGHTS.map((w) => (
               <div className="kv" key={w.band}>
                 <span>{w.band}</span>
-                <b>{w.weight} of wager counted</b>
+                <b>{w.weight} counted when weighted</b>
               </div>
             ))}
           </div>
@@ -166,6 +175,6 @@ export default async function LeaderboardPage() {
       <HowToEnter />
       <Faq />
       <Socials />
-    </>
+    </RankModeProvider>
   );
 }

@@ -1,4 +1,8 @@
+'use client';
+
 import { formatMoney } from '@/lib/format';
+import { RANK_MODES } from '@/lib/partners';
+import { useRankMode } from './RankMode';
 import type { Leaderboard, LeaderboardEntry } from '@/lib/types';
 import { TrophyIcon } from './icons';
 
@@ -17,15 +21,19 @@ const PLACES = [
 ] as const;
 
 export function Podium({ board }: { board: Leaderboard }) {
+  const { mode } = useRankMode();
+  const entries = board.rankings[mode].entries;
+
   return (
     <div className="podium">
       {PLACES.map(({ place, rank, label }) => (
         <PodiumCard
           key={place}
-          entry={board.entries[place - 1]}
+          entry={entries[place - 1]}
           place={place}
           rank={rank}
           label={label}
+          metric={RANK_MODES[mode].metric}
         />
       ))}
     </div>
@@ -37,11 +45,13 @@ function PodiumCard({
   place,
   rank,
   label,
+  metric,
 }: {
   entry: LeaderboardEntry | undefined;
   place: number;
   rank: string;
   label: string;
+  metric: string;
 }) {
   // A paying seat nobody has taken is the ordinary case at this community
   // size, so the card renders with the prize still on it and says so plainly.
@@ -70,7 +80,7 @@ function PodiumCard({
 
           <p className="pod-name">{open ? 'Open seat' : entry.username}</p>
 
-          <p className="pod-metric">Weighted</p>
+          <p className="pod-metric">{metric}</p>
           <p className="pod-wagered">
             <span className="sym">$</span>
             {(open ? 0 : entry.wagered).toLocaleString('en-US', {

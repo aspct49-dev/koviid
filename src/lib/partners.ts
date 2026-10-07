@@ -1,4 +1,4 @@
-import type { NavLink, Partner, PartnerId, SocialCard } from './types';
+import type { NavLink, Partner, PartnerId, RankMode, SocialCard } from './types';
 
 /**
  * Payout per rank, index 0 = 1st. The pool is summed from this, never typed
@@ -24,9 +24,6 @@ export const PARTNERS: Record<PartnerId, Partner> = {
     signupUrl: 'https://roobet.com/?ref=koviid',
     prizePool: ROOBET_PRIZES.reduce((sum, n) => sum + n, 0),
     prizeTable: ROOBET_PRIZES,
-    // Roobet weights wagers by game to stop low-edge grinding from farming the
-    // board, so the ranked figure is the weighted one, not the raw stake.
-    metricLabel: 'Weighted amount wagered',
   },
 };
 
@@ -62,9 +59,51 @@ export const WAGER_WEIGHTS = [
   { band: 'RTP of 99% and over', weight: '10%', note: 'Dice and the lowest-edge originals' },
 ];
 
-/** Roobet's wording, kept close to theirs because it is their rule. */
+/** What settles the month, said before anything about the other view. */
 export const WAGER_NOTE =
-  'Leaderboard wager amounts may differ from your statistics on Roobet, depending on the games you are playing.';
+  'Prizes settle on total amount wagered, at face value. Every bet counts for what it was staked, whatever game it was placed on.';
+
+/**
+ * The two ways the same month can be ordered, and what to call each.
+ *
+ * `pays` is the one that settles. It is a field rather than something the UI
+ * infers from the default, because the whole hazard of a switcher on a board
+ * with money attached is someone screenshotting the view that does not pay and
+ * believing it. Every surface that renders a mode reads this flag.
+ */
+export const RANK_MODES: Record<RankMode, {
+  id: RankMode;
+  /** On the switch itself. */
+  label: string;
+  /** Column head and the metric line on a podium card. */
+  metric: string;
+  /** One line under the switch saying what this ordering is. */
+  note: string;
+  pays: boolean;
+}> = {
+  raw: {
+    id: 'raw',
+    label: 'Unweighted',
+    metric: 'Wagered',
+    note: 'Every bet at face value, the same figure Roobet shows you.',
+    pays: true,
+  },
+  weighted: {
+    id: 'weighted',
+    label: 'Weighted',
+    metric: 'Weighted',
+    note: `Each bet discounted by the game's RTP, using ${PARTNERS.roobet.name}'s own weighting.`,
+    pays: false,
+  },
+};
+
+/** What the board settles on, and what it opens on. */
+export const DEFAULT_RANK_MODE: RankMode = 'raw';
+
+/** The mode that actually pays, derived so the two can never disagree. */
+export const PAYING_RANK_MODE: RankMode = (
+  Object.values(RANK_MODES).find((m) => m.pays) ?? RANK_MODES.raw
+).id;
 
 /**
  * The two ways a player gets removed from the board, stated as rules rather
@@ -80,7 +119,7 @@ export const FAIR_PLAY = [
   {
     id: 'abuse',
     title: 'No wager abuse',
-    body: `Wagering meant to inflate a figure, not to play, does not count. That covers low-edge cycling, matched or hedged betting across games, and anything Roobet flags as bonus or promotion abuse.`,
+    body: `Grinding a low-edge game is fine and counts in full, because the paying board does not discount it. What does not count is wagering that is not really play: matched or hedged betting that covers both sides of an outcome, stakes cycled between accounts, and anything Roobet flags as bonus or promotion abuse.`,
   },
 ];
 

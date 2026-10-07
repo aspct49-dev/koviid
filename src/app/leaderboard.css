@@ -614,3 +614,72 @@
   .cd-cells { gap: 7px; }
   .cd-cell { width: 100%; max-width: 74px; }
 }
+
+/* ------------------------------------------------------------ rank switch */
+
+.rankswitch { margin: 0 0 18px; }
+
+/* The track is the parent and the thumb is one absolutely-positioned child
+   that slides between halves, so the movement reads as one control changing
+   rather than two buttons swapping colour. */
+.rankswitch-control {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(104px, auto));
+  padding: 4px;
+  border: 1px solid var(--edge);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #0a0f1e 0%, #05080f 100%);
+}
+
+.rankswitch-thumb {
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--blue-hot) 0%, var(--blue) 52%, #0f63d6 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 22px -6px rgba(27, 132, 255, 0.8);
+  transition: transform 0.26s var(--ease-out);
+}
+.rankswitch-thumb[data-mode='weighted'] { transform: translateX(100%); }
+
+.rankswitch-opt {
+  position: relative;
+  z-index: 1;
+  padding: 8px 18px;
+  border: 0;
+  background: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--dim);
+  white-space: nowrap;
+  transition: color 0.2s var(--ease);
+}
+.rankswitch-opt:hover { color: var(--text); }
+/* Near-black on the lit thumb, the same ink the primary button uses. */
+.rankswitch-opt[data-on] { color: #02101f; }
+
+.rankswitch-note {
+  margin: 11px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--dim);
+}
+/* The claim that matters: which board the money comes off. Stated on both
+   sides of the switch so it is never absent, only different. */
+.rankswitch-pays { color: #3ddc97; font-weight: 600; }
+.rankswitch-info { color: var(--blue-hot); font-weight: 600; }
+
+@media (max-width: 520px) {
+  .rankswitch-control { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .rankswitch-opt { padding: 9px 10px; }
+}

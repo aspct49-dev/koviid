@@ -1,4 +1,5 @@
 import { formatMoney, periodLabel } from '@/lib/format';
+import { PAYING_RANK_MODE } from '@/lib/partners';
 import type { Leaderboard } from '@/lib/types';
 import { TrophyIcon } from './icons';
 
@@ -9,9 +10,13 @@ import { TrophyIcon } from './icons';
  *
  * Renders nothing when last month had no players: an empty "previous winners"
  * block answers that question the wrong way round.
+ *
+ * Not switchable. A settled month paid out on one measure and no other, so
+ * offering to re-rank it would show an order that never happened next to the
+ * prizes that actually went out.
  */
 export function PastWinners({ board }: { board: Leaderboard }) {
-  const winners = board.entries.filter((e) => !e.unclaimed).slice(0, 5);
+  const winners = board.rankings[PAYING_RANK_MODE].entries.filter((e) => !e.unclaimed).slice(0, 5);
   if (!winners.length || board.error) return null;
 
   return (

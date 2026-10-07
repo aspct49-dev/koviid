@@ -2,7 +2,7 @@ import 'server-only';
 
 import { getPartner } from '../partners';
 import { buildEntries } from './shared';
-import type { Leaderboard, LeaderboardProvider, Period } from '../types';
+import type { Leaderboard, LeaderboardProvider, Period, RankMode, Ranking } from '../types';
 
 /**
  * Roobet affiliate wager stats.
@@ -18,7 +18,7 @@ import type { Leaderboard, LeaderboardProvider, Period } from '../types';
  *      the period we display, and the two cannot drift. See `isoDate` and
  *      `exclusiveEnd` for the half-open window this endpoint actually uses.
  *   2. It returns both `wagered` and `weightedWagered`. Roobet weights by RTP
- *      to stop low-edge grinding from farming a board, and the published rules
+ *      to discourage low-edge grinding, and the published rules
  *      rank on the weighted figure, so that is the one used here. The raw
  *      figure is deliberately not shown, because showing both invites the
  *      question of which one pays.
@@ -69,14 +69,37 @@ function exclusiveEnd(d: Date): string {
 }
 
 /**
- * The figure the board ranks on, displays and totals.
+ * The figure for a given mode.
  *
- * Falls back to the raw stake only where a row omits the weight: a row with no
- * weighted figure is better ranked on what it does carry than dropped to zero.
- * Every live row carries one.
+ * `weighted` falls back to the raw stake where a row omits the weight: a row
+ * with no weighted figure is better ranked on what it does carry than dropped
+ * to zero. Every live row carries one.
  */
-function ranked(row: RoobetRow): number {
+function figure(row: RoobetRow, mode: RankMode): number {
+  if (mode === 'raw') return row.wagered ?? 0;
   return row.weightedWagered ?? row.wagered ?? 0;
+}
+
+/** One complete ordering of the month by one of the two measures. */
+function rank(rows: RoobetRow[], mode: RankMode, prizeTable: number[]): Ranking {
+  const sorted = [...rows].sort((a, b) => figure(b, mode) - figure(a, mode));
+  return {
+    entries: buildEntries(
+      sorted.map((row) => ({
+        username: row.username,
+        wagered: figure(row, mode),
+        // Carried through but not rendered — on a masked name it would be the
+        // only identifying detail left.
+        favouriteGame: row.favoriteGameTitle,
+      })),
+      prizeTable,
+    ),
+    stats: {
+      players: rows.length,
+      totalWagered: rows.reduce((sum, r) => sum + figure(r, mode), 0),
+      topWager: sorted.length ? figure(sorted[0], mode) : 0,
+    },
+  };
 }
 
 export const roobetProvider: LeaderboardProvider = {
@@ -108,30 +131,20 @@ export const roobetProvider: LeaderboardProvider = {
       throw new Error('Roobet returned an unexpected payload');
     }
 
-    const sorted = [...payload].sort((a, b) => ranked(b) - ranked(a));
-
     return {
       partnerId: 'roobet',
       prizePool: partner.prizePool,
-      entries: buildEntries(
-        sorted.map((row) => ({
-          username: row.username,
-          wagered: ranked(row),
-          // Carried through but not rendered — on a masked name it would be
-          // the only identifying detail left.
-          favouriteGame: row.favoriteGameTitle,
-        })),
-        partner.prizeTable,
-      ),
+      // Both orderings, every request. The switch between them is a client-side
+      // toggle, and a round trip per flip would make it feel like a page it is
+      // not. Ranking the same 20-odd rows twice costs nothing.
+      rankings: {
+        raw: rank(payload, 'raw', partner.prizeTable),
+        weighted: rank(payload, 'weighted', partner.prizeTable),
+      },
       periodStart: period.start.toISOString(),
       periodEnd: period.end.toISOString(),
       updatedAt: new Date().toISOString(),
       source: 'live',
-      stats: {
-        players: payload.length,
-        totalWagered: payload.reduce((sum, r) => sum + ranked(r), 0),
-        topWager: sorted.length ? ranked(sorted[0]) : 0,
-      },
     };
   },
 };

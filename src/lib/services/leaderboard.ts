@@ -27,15 +27,20 @@ const PROVIDERS: Record<PartnerId, LeaderboardProvider> = {
  */
 function fallbackFor(partnerId: PartnerId, period: Period, error: string): Leaderboard {
   const partner = getPartner(partnerId);
+  const empty = {
+    entries: buildEntries([], partner.prizeTable),
+    stats: { players: 0, totalWagered: 0, topWager: 0 },
+  };
   return {
     partnerId,
     prizePool: partner.prizePool,
-    entries: buildEntries([], partner.prizeTable),
+    // Both modes, so the switch still works while the feed is down and shows
+    // the same empty board either way instead of disappearing.
+    rankings: { raw: empty, weighted: empty },
     periodStart: period.start.toISOString(),
     periodEnd: period.end.toISOString(),
     updatedAt: new Date().toISOString(),
     source: 'mock',
-    stats: { players: 0, totalWagered: 0, topWager: 0 },
     error,
   };
 }

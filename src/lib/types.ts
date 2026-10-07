@@ -21,15 +21,25 @@ export interface Partner {
   prizePool: number;
   /** Payout per rank, index 0 = 1st. Length defines how many seats pay. */
   prizeTable: number[];
-  /** What the ranking is measured on, stated verbatim in the rules copy. */
-  metricLabel: string;
 }
+
+/**
+ * Which figure the board is ordered on.
+ *
+ *   `raw`      — every bet at face value, the number Roobet shows the player.
+ *   `weighted` — each bet discounted by the game's RTP, Roobet's own measure.
+ *
+ * Both are computed and served on every request, because the switch between
+ * them is a client-side toggle and a round trip per flip would make it feel
+ * like a page it is not.
+ */
+export type RankMode = 'raw' | 'weighted';
 
 export interface LeaderboardEntry {
   rank: number;
   /** Masked for display — the provider never hands a full username to the UI. */
   username: string;
-  /** The figure the board is ranked on. Roobet weights this by game. */
+  /** The figure *this* ranking is ordered on, in this ranking's own terms. */
   wagered: number;
   prize: number;
   favouriteGame?: string;
@@ -44,16 +54,22 @@ export interface BoardStats {
   topWager: number;
 }
 
+/** One complete ordering of the same month, by one of the two measures. */
+export interface Ranking {
+  /** Always prizeTable.length long — unfilled seats come back unclaimed. */
+  entries: LeaderboardEntry[];
+  stats: BoardStats;
+}
+
 export interface Leaderboard {
   partnerId: PartnerId;
   prizePool: number;
-  /** Always prizeTable.length long — unfilled seats come back unclaimed. */
-  entries: LeaderboardEntry[];
+  /** The same period ordered both ways. The UI picks one. */
+  rankings: Record<RankMode, Ranking>;
   periodStart: string;
   periodEnd: string;
   updatedAt: string;
   source: DataSource;
-  stats: BoardStats;
   /** Set when the live provider failed and an empty board was served instead. */
   error?: string;
 }

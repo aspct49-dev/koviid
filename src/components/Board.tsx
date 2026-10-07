@@ -1,6 +1,9 @@
+'use client';
+
 import { FeedState } from '@/components/FeedState';
 import { formatMoney } from '@/lib/format';
-import { PRIMARY_PARTNER } from '@/lib/partners';
+import { RANK_MODES } from '@/lib/partners';
+import { useRankMode } from './RankMode';
 import type { Leaderboard } from '@/lib/types';
 
 /**
@@ -12,6 +15,9 @@ import type { Leaderboard } from '@/lib/types';
  * persuasive one.
  */
 export function Board({ board }: { board: Leaderboard }) {
+  const { mode } = useRankMode();
+  const { entries } = board.rankings[mode];
+
   return (
     <div className="board">
       {board.error && (
@@ -31,11 +37,11 @@ export function Board({ board }: { board: Leaderboard }) {
       <div className="board-head" role="presentation">
         <span>Rank</span>
         <span>Player</span>
-        <span>Weighted</span>
+        <span>{RANK_MODES[mode].metric}</span>
         <span>Prize</span>
       </div>
 
-      {board.entries.map((entry) => (
+      {entries.map((entry) => (
         <div
           className="board-row"
           key={entry.rank}
@@ -69,18 +75,21 @@ export function Board({ board }: { board: Leaderboard }) {
 }
 
 export function BoardStats({ board }: { board: Leaderboard }) {
+  const { mode } = useRankMode();
+  const { stats } = board.rankings[mode];
+
   return (
     <div className="board-stats">
       <div className="stat">
-        <div className="stat-v">{board.stats.players.toLocaleString('en-US')}</div>
+        <div className="stat-v">{stats.players.toLocaleString('en-US')}</div>
         <span className="stat-k">Players on the board</span>
       </div>
       <div className="stat">
-        <div className="stat-v">{formatMoney(board.stats.totalWagered)}</div>
-        <span className="stat-k">{PRIMARY_PARTNER.metricLabel} this month</span>
+        <div className="stat-v">{formatMoney(stats.totalWagered)}</div>
+        <span className="stat-k">{RANK_MODES[mode].metric} this month</span>
       </div>
       <div className="stat">
-        <div className="stat-v">{formatMoney(board.stats.topWager)}</div>
+        <div className="stat-v">{formatMoney(stats.topWager)}</div>
         <span className="stat-k">Leading figure</span>
       </div>
     </div>
