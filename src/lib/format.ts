@@ -56,3 +56,28 @@ export function periodLabel(start: string): string {
     timeZone: 'UTC',
   });
 }
+
+/**
+ * Short form for the big end of the rank ladder.
+ *
+ * "$10,000,000,000" is eleven glyphs of noise in a table column, and the
+ * reader only needs the magnitude. Thresholds below $1m stay written out in
+ * full, because at that end the exact figure is the thing someone is actually
+ * measuring themselves against.
+ */
+export function formatCompact(n: number): string {
+  if (n >= 1_000_000_000) return trimZero(n / 1_000_000_000) + 'B';
+  if (n >= 1_000_000) return trimZero(n / 1_000_000) + 'M';
+  return formatMoney(n);
+}
+
+/**
+ * Up to two decimals, with trailing zeros dropped: 10, 1.3, 2.25.
+ *
+ * Two rather than one because these are thresholds people measure themselves
+ * against, and one decimal rounds $2,250,000 up to "$2.3M" — which tells
+ * somebody sitting on $2.26M that they have not reached a rank they have.
+ */
+function trimZero(v: number): string {
+  return '$' + Number(v.toFixed(2)).toString();
+}
