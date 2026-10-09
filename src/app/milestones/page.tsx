@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { CopyCode } from '@/components/CopyCode';
 import { ExternalIcon } from '@/components/icons';
-import { formatCompact, formatMoney } from '@/lib/format';
+import { formatMoney } from '@/lib/format';
 import {
   BAND_HUE,
   MILESTONES,
@@ -10,14 +10,13 @@ import {
   MILESTONE_STEPS,
   MILESTONE_TOP,
   MILESTONE_TOTAL,
-  PAYING_MILESTONES,
 } from '@/lib/milestones';
 import { DISCORD_INVITE, PRIMARY_PARTNER } from '@/lib/partners';
 import { SITE, pageMeta } from '@/lib/site';
 
 export const metadata: Metadata = pageMeta({
   title: 'Milestones',
-  description: `${formatMoney(MILESTONE_TOTAL)} across ${PAYING_MILESTONES.length} rank-up rewards, paid once each as your lifetime wagered under code ${PRIMARY_PARTNER.code} climbs ${PRIMARY_PARTNER.name}'s ladder.`,
+  description: `${formatMoney(MILESTONE_TOTAL)} across ${MILESTONES.length} rank-up rewards, paid once each as your lifetime wagered under code ${PRIMARY_PARTNER.code} climbs.`,
   path: '/milestones',
 });
 
@@ -40,9 +39,9 @@ export default function MilestonesPage() {
           </h1>
 
           <p className="lb-lede">
-            {PRIMARY_PARTNER.name}&rsquo;s rank ladder, with a one-time payout on every rank up to
-            Diamond III. These run alongside the monthly leaderboard — your lifetime wagered keeps
-            climbing whether or not you place.
+            {MILESTONES.length} ranks, each paying once the first time you pass it. These run
+            alongside the monthly leaderboard — your lifetime wagered keeps climbing whether or not
+            you place.
           </p>
 
           <div className="lb-actions">
@@ -60,15 +59,15 @@ export default function MilestonesPage() {
 
           <div className="ms-stats">
             <div className="stat">
-              <div className="stat-v">{PAYING_MILESTONES.length}</div>
-              <span className="stat-k">Ranks that pay</span>
+              <div className="stat-v">{MILESTONES.length}</div>
+              <span className="stat-k">Ranks on the ladder</span>
             </div>
             <div className="stat">
               <div className="stat-v">{formatMoney(MILESTONE_TOP)}</div>
               <span className="stat-k">Biggest single rank-up</span>
             </div>
             <div className="stat">
-              <div className="stat-v">{formatCompact(MILESTONE_FINAL)}</div>
+              <div className="stat-v">{formatMoney(MILESTONE_FINAL)}</div>
               <span className="stat-k">Wagered to clear them all</span>
             </div>
           </div>
@@ -78,34 +77,28 @@ export default function MilestonesPage() {
       <section className="section wrap">
         <div className="section-head">
           <h2 className="h-section">The Ladder</h2>
-          <p>
-            Lifetime wagered under code {PRIMARY_PARTNER.code}. Every rank pays once, the first
-            time you pass it.
-          </p>
+          <p>Lifetime wagered under code {PRIMARY_PARTNER.code}. Every rank pays once.</p>
         </div>
 
         <div className="ladder">
           {MILESTONES.map((m, i) => {
-            // A divider wherever the family changes, so thirty-one rows read as
-            // groups without the groups being hardcoded as row numbers.
+            // A divider wherever the reward changes, so twenty rows read as
+            // five bands without the bands being hardcoded as row numbers.
             const opensBand = i === 0 || MILESTONES[i - 1].band !== m.band;
-            const sameBand = MILESTONES.filter((x) => x.band === m.band);
             // "each" only makes sense where the band holds more than one rank.
-            const bandLabel = !m.reward
-              ? m.band
-              : `${m.band} · ${formatMoney(m.reward)}${sameBand.length > 1 ? ' each' : ''}`;
+            const bandSize = MILESTONES.filter((x) => x.band === m.band).length;
 
             return (
               <div
                 className="ms-row"
                 key={m.rank}
                 data-band={m.band}
-                data-unpaid={!m.reward || undefined}
                 style={{ ['--hue' as string]: BAND_HUE[m.band] }}
               >
                 {opensBand && (
                   <span className="ms-band" aria-hidden>
-                    {bandLabel}
+                    {m.band} · {formatMoney(m.reward)}
+                    {bandSize > 1 ? ' each' : ''}
                   </span>
                 )}
 
@@ -115,32 +108,21 @@ export default function MilestonesPage() {
 
                 <span className="ms-emblem">
                   {/* eslint-disable-next-line @next/next/no-img-element -- rank emblem */}
-                  <img src={`/ranks/${m.emblem}.webp`} alt="" width="164" height="104" />
+                  <img src={`/ranks/${m.emblem}.webp`} alt="" width="160" height="100" />
                 </span>
 
                 <span className="ms-name">{m.rank}</span>
 
                 <span className="ms-req">
                   <span className="ms-req-k">Wagered</span>
-                  {formatCompact(m.requirement)}
+                  {formatMoney(m.requirement)}
                 </span>
 
-                <span className="ms-reward">
-                  {m.reward ? formatMoney(m.reward) : <span className="ms-dash">—</span>}
-                </span>
+                <span className="ms-reward">{formatMoney(m.reward)}</span>
               </div>
             );
           })}
         </div>
-
-        <p className="notice" style={{ marginTop: 20 }}>
-          <span className="notice-mark" aria-hidden>
-            !
-          </span>
-          Champion I and everything above it is {PRIMARY_PARTNER.name}&rsquo;s ladder shown in full.
-          Those ranks start at {formatCompact(18_000_000)} wagered and carry no milestone reward
-          yet.
-        </p>
       </section>
 
       <section className="section wrap" id="claiming">
@@ -172,9 +154,9 @@ export default function MilestonesPage() {
           <span className="notice-mark" aria-hidden>
             !
           </span>
-          The ranks and wager requirements are {PRIMARY_PARTNER.name}&rsquo;s own. The rewards
-          beside them are {SITE.name}&rsquo;s, funded out of affiliate revenue, and the same
-          fair-play rules as the leaderboard apply.
+          The rank names and thresholds here are {SITE.name}&rsquo;s own, not{' '}
+          {PRIMARY_PARTNER.name}&rsquo;s. They are measured on wagered amount at face value, the
+          same figure the leaderboard settles on, and the same fair-play rules apply.
         </p>
       </section>
     </>

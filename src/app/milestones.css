@@ -45,7 +45,7 @@
 .ms-row {
   position: relative;
   display: grid;
-  grid-template-columns: 38px 82px minmax(0, 1fr) auto auto;
+  grid-template-columns: 38px 64px minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 18px;
   min-height: 72px;
@@ -93,11 +93,12 @@
 
 .ms-emblem { display: grid; place-items: center; }
 .ms-emblem img {
-  /* Exactly half the 164x104 file, which is itself exactly 4x the 41x26 art
-     Roobet ships. A 1x screen lands on 2x the original and a 2x screen on 4x,
-     so every source pixel covers a whole number of device pixels either way.
-     The old 3.9x scale is what made these look smeared. */
-  width: 82px;
+  /* The file is 164px wide and renders at 64, so the browser is downscaling.
+     That is what keeps these clean: the art is only 41px across natively, and
+     a downscale hides the softness an upscale from that size would otherwise
+     show. No image-rendering override -- smoothing is wanted here, not pixel
+     blocks. */
+  width: 64px;
   height: auto;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
 }
@@ -156,22 +157,16 @@
   /* The ordinal goes: at this width the emblem and the name carry position
      well enough, and 38px of tabular figures is the cheapest column to lose. */
   .ms-row {
-    grid-template-columns: 66px minmax(0, 1fr) auto;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
     gap: 4px 14px;
     padding: 14px 16px;
     min-height: 0;
   }
   .ms-n { display: none; }
   .ms-emblem { grid-row: 1 / span 2; }
-  .ms-emblem img { width: 66px; }
+  .ms-emblem img { width: 52px; }
   .ms-name { grid-column: 2; grid-row: 1; font-size: 15px; }
   .ms-req { grid-column: 2; grid-row: 2; justify-items: start; text-align: left; font-size: 13.5px; }
   .ms-req-k { display: none; }
   .ms-reward { grid-column: 3; grid-row: 1 / span 2; font-size: 18px; }
 }
-
-/* Champion and above: shown because it is the real ladder, held back because
-   nothing is attached to them yet. */
-.ms-row[data-unpaid] { opacity: 0.6; }
-.ms-row[data-unpaid]:hover { opacity: 1; }
-.ms-dash { color: var(--dim); font-weight: 600; }
