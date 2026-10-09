@@ -13,6 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: SITE.url, lastModified: new Date(), changeFrequency: 'hourly', priority: 1 },
     {
+      url: `${SITE.url}/milestones`,
+      lastModified: legalUpdated,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: `${SITE.url}/terms`,
       lastModified: legalUpdated,
       changeFrequency: 'yearly',

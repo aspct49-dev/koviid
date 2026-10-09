@@ -241,6 +241,7 @@ export const SOCIAL_PLATFORMS = SOCIALS.filter((s) => s.social);
  */
 export const EXPLORE_LINKS: NavLink[] = [
   { label: 'Leaderboard', href: '/' },
+  { label: 'Milestones', href: '/milestones' },
   { label: 'Wager rules', href: '/#wager-rules' },
   { label: 'How to enter', href: '/#how-to-enter' },
   { label: 'Questions', href: '/#faq' },

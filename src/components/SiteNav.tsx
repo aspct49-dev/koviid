@@ -17,6 +17,7 @@ import { SITE } from '@/lib/site';
 const LINKS = [
   { label: 'Leaderboard', href: '/#standings' },
   { label: 'Rewards', href: '/#rewards' },
+  { label: 'Milestones', href: '/milestones' },
   { label: 'How to enter', href: '/#how-to-enter' },
   { label: 'Questions', href: '/#faq' },
 ];

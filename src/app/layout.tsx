@@ -8,6 +8,7 @@ import './globals.css';
 import './nav.css';
 import './leaderboard.css';
 import './sections.css';
+import './milestones.css';
 import './rewards.css';
 import './socials.css';
 import './footer.css';
