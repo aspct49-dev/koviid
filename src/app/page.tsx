@@ -12,7 +12,7 @@ import { RankModeProvider, RankSwitch } from '@/components/RankMode';
 import { Socials } from '@/components/Socials';
 import { ExternalIcon, ShieldIcon } from '@/components/icons';
 import { currentPeriod, formatMoney, periodLabel, previousPeriod } from '@/lib/format';
-import { FAIR_PLAY, PRIMARY_PARTNER, WAGER_NOTE, WAGER_WEIGHTS } from '@/lib/partners';
+import { FAIR_PLAY, LEADERBOARD_PAUSED, PRIMARY_PARTNER, WAGER_NOTE, WAGER_WEIGHTS } from '@/lib/partners';
 import { pageMeta } from '@/lib/site';
 import { getLeaderboard } from '@/lib/services/leaderboard';
 
@@ -70,8 +70,17 @@ export default async function LeaderboardPage() {
           </h1>
 
           <p className="lb-lede">
-            Compete against everyone else playing under code <b>{PRIMARY_PARTNER.code}</b>. Ten
-            places pay, and the board settles at the end of the month.
+            {LEADERBOARD_PAUSED ? (
+              <>
+                The leaderboard is paused for now. Last month&rsquo;s results are below, and the board
+                will be announced on the socials when it resumes.
+              </>
+            ) : (
+              <>
+                Compete against everyone else playing under code <b>{PRIMARY_PARTNER.code}</b>. Ten
+                places pay, and the board settles at the end of the month.
+              </>
+            )}
           </p>
 
           <div className="lb-actions">
@@ -87,32 +96,49 @@ export default async function LeaderboardPage() {
             </a>
           </div>
 
-          <div className="lb-podium">
-            <Podium board={board} />
-          </div>
-
-          <Countdown endsAt={board.periodEnd} />
+          {LEADERBOARD_PAUSED ? (
+            <p className="lb-paused" role="status">
+              <span className="lb-paused-dot" aria-hidden />
+              Leaderboard paused
+            </p>
+          ) : (
+            <>
+              <div className="lb-podium">
+                <Podium board={board} />
+              </div>
+              <Countdown endsAt={board.periodEnd} />
+            </>
+          )}
         </div>
       </header>
+
+      {/* While paused, the settled month is the thing worth reading, so it
+          moves up to sit directly under the notice. */}
+      {LEADERBOARD_PAUSED && <PastWinners board={previous} />}
 
       <section className="section wrap" id="standings">
         {/* The month the board is for. It used to sit in the hero as part of a
             chip; it belongs on the standings, which are the thing that is
             specific to a month. */}
-        <div className="section-head">
-          <h2 className="h-section">Standings</h2>
-          <p>
-            {periodLabel(board.periodStart)} · {PRIMARY_PARTNER.prizeTable.length} paying places
-          </p>
-        </div>
+        {!LEADERBOARD_PAUSED && (
+          <div className="section-head">
+            <h2 className="h-section">Standings</h2>
+            <p>
+              {periodLabel(board.periodStart)} · {PRIMARY_PARTNER.prizeTable.length} paying places
+            </p>
+          </div>
+        )}
 
         {/* The switch sits with the table rather than with the podium, because
             this is where someone is reading figures closely enough to want the
             other measure. It governs both. */}
-        <RankSwitch />
-
-        <Board board={board} />
-        <BoardStats board={board} />
+        {!LEADERBOARD_PAUSED && (
+          <>
+            <RankSwitch />
+            <Board board={board} />
+            <BoardStats board={board} />
+          </>
+        )}
 
         {/* On the page the board is on, not one click away. Someone querying
             their position is standing right here when they do it. */}
@@ -121,20 +147,25 @@ export default async function LeaderboardPage() {
           <p className="lede" style={{ marginTop: 12 }}>
             {WAGER_NOTE}
           </p>
-          <p className="lede" style={{ marginTop: 10 }}>
-            The standings above can also be viewed weighted, which is {PRIMARY_PARTNER.name}
-            &rsquo;s own measure: each bet discounted by the RTP of the game it was placed on.
-            That view is there for comparison and does not decide prizes. Their bands:
-          </p>
-
-          <div style={{ marginTop: 16 }}>
-            {WAGER_WEIGHTS.map((w) => (
-              <div className="kv" key={w.band}>
-                <span>{w.band}</span>
-                <b>{w.weight} counted when weighted</b>
+          {/* Describes the weighted view of the standings, so it goes with them. */}
+          {!LEADERBOARD_PAUSED && (
+            <>
+              <p className="lede" style={{ marginTop: 10 }}>
+                The standings above can also be viewed weighted, which is {PRIMARY_PARTNER.name}
+                &rsquo;s own measure: each bet discounted by the RTP of the game it was placed on.
+                That view is there for comparison and does not decide prizes. Their bands:
+              </p>
+  
+              <div style={{ marginTop: 16 }}>
+                {WAGER_WEIGHTS.map((w) => (
+                  <div className="kv" key={w.band}>
+                    <span>{w.band}</span>
+                    <b>{w.weight} counted when weighted</b>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
 
           {/* The two disqualifying rules, stated as rules rather than as a
               threat — and stated here, where someone can read them before they
@@ -170,7 +201,7 @@ export default async function LeaderboardPage() {
       <Rewards />
 
       {/* Renders nothing in a first month, when there is no previous board. */}
-      <PastWinners board={previous} />
+      {!LEADERBOARD_PAUSED && <PastWinners board={previous} />}
 
       <HowToEnter />
       <Faq />

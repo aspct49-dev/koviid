@@ -33,6 +33,13 @@ export const PARTNERS: Record<PartnerId, Partner> = {
  */
 export const DISCORD_INVITE = 'https://discord.gg/GDrPqTeCyQ';
 
+/**
+ * Whether the current month's board is running. While paused the page drops
+ * the live podium, countdown and standings and says so, and the settled
+ * previous month moves to the top. Flip back to false to resume.
+ */
+export const LEADERBOARD_PAUSED = true;
+
 export const PARTNER_ORDER: PartnerId[] = ['roobet'];
 
 export function getPartner(id: PartnerId): Partner {
