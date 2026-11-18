@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
+import localFont from 'next/font/local';
 
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteNav } from '@/components/SiteNav';
@@ -18,16 +18,22 @@ import './legal.css';
    with circular bowls and soft terminals — the same construction as the neon
    wordmark, so the headings and the logo read as one voice — and it ships
    tabular figures, which is why there is no third family for the numbers.
-   Inter is quiet and handles everything a person actually reads. */
-const display = Plus_Jakarta_Sans({
-  weight: ['600', '700', '800'],
-  subsets: ['latin'],
+   Inter is quiet and handles everything a person actually reads.
+
+   Both are self-hosted from ./fonts (Latin, variable weight, OFL — licences
+   alongside) rather than fetched from Google Fonts at build time. The Google
+   loader in next/font crashes the build whenever Google hands back a font URL
+   it does not expect, which took a production deploy down; files in the repo
+   cannot do that. */
+const display = localFont({
+  src: './fonts/plus-jakarta-sans-latin-wght-normal.woff2',
+  weight: '200 800',
   variable: '--font-display-face',
   display: 'swap',
 });
-const sans = Inter({
-  weight: ['400', '500', '600'],
-  subsets: ['latin'],
+const sans = localFont({
+  src: './fonts/inter-latin-wght-normal.woff2',
+  weight: '100 900',
   variable: '--font-sans-face',
   display: 'swap',
 });
