@@ -1,9 +1,6 @@
-'use client';
-
 import { FeedState } from '@/components/FeedState';
 import { formatMoney } from '@/lib/format';
-import { RANK_MODES } from '@/lib/partners';
-import { useRankMode } from './RankMode';
+import { RANK_MODE_LABEL, otherMode } from '@/lib/partners';
 import type { Leaderboard } from '@/lib/types';
 
 /**
@@ -13,10 +10,14 @@ import type { Leaderboard } from '@/lib/types';
  * up — so an unclaimed place renders with its prize attached and says the seat
  * is open. At this community size that is the honest picture and also the more
  * persuasive one.
+ *
+ * Each row shows the figure the board pays on, large, and the other measure
+ * under it in small type with its own label, so both are on screen at once and
+ * there is no question which one decides the order.
  */
 export function Board({ board }: { board: Leaderboard }) {
-  const { mode } = useRankMode();
-  const { entries } = board.rankings[mode];
+  const { entries } = board.rankings[board.pays];
+  const alt = otherMode(board.pays);
 
   return (
     <div className="board">
@@ -37,7 +38,7 @@ export function Board({ board }: { board: Leaderboard }) {
       <div className="board-head" role="presentation">
         <span>Rank</span>
         <span>Player</span>
-        <span>{RANK_MODES[mode].metric}</span>
+        <span>{RANK_MODE_LABEL[board.pays]}</span>
         <span>Prize</span>
       </div>
 
@@ -61,7 +62,17 @@ export function Board({ board }: { board: Leaderboard }) {
           </span>
 
           <span className="board-wagered">
-            {entry.unclaimed ? '—' : formatMoney(entry.wagered, { cents: true })}
+            {entry.unclaimed ? (
+              '—'
+            ) : (
+              <>
+                <span className="board-main">{formatMoney(entry.wagered, { cents: true })}</span>
+                <span className="board-alt">
+                  <span className="alt-tag">{RANK_MODE_LABEL[alt]}</span>
+                  {formatMoney(entry[alt])}
+                </span>
+              </>
+            )}
           </span>
 
           <span className="board-prize">
@@ -75,8 +86,9 @@ export function Board({ board }: { board: Leaderboard }) {
 }
 
 export function BoardStats({ board }: { board: Leaderboard }) {
-  const { mode } = useRankMode();
-  const { stats } = board.rankings[mode];
+  const { stats } = board.rankings[board.pays];
+  const alt = otherMode(board.pays);
+  const altTotal = board.rankings[alt].stats.totalWagered;
 
   return (
     <div className="board-stats">
@@ -86,7 +98,10 @@ export function BoardStats({ board }: { board: Leaderboard }) {
       </div>
       <div className="stat">
         <div className="stat-v">{formatMoney(stats.totalWagered)}</div>
-        <span className="stat-k">{RANK_MODES[mode].metric} this month</span>
+        <span className="stat-k">
+          {RANK_MODE_LABEL[board.pays]} wagered so far · {formatMoney(altTotal)}{' '}
+          {RANK_MODE_LABEL[alt].toLowerCase()}
+        </span>
       </div>
       <div className="stat">
         <div className="stat-v">{formatMoney(stats.topWager)}</div>

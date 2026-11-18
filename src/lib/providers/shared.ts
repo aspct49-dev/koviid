@@ -9,7 +9,10 @@ import type { LeaderboardEntry } from '../types';
  */
 export interface RawPlayer {
   username: string;
+  /** The figure this ranking is ordered on. */
   wagered: number;
+  raw: number;
+  weighted: number;
   favouriteGame?: string;
 }
 
@@ -27,12 +30,14 @@ export function buildEntries(players: RawPlayer[], prizeTable: number[]): Leader
   return prizeTable.map((prize, i) => {
     const player = players[i];
     if (!player) {
-      return { rank: i + 1, username: '', wagered: 0, prize, unclaimed: true };
+      return { rank: i + 1, username: '', wagered: 0, raw: 0, weighted: 0, prize, unclaimed: true };
     }
     return {
       rank: i + 1,
       username: maskUsername(player.username),
       wagered: player.wagered,
+      raw: player.raw,
+      weighted: player.weighted,
       prize,
       favouriteGame: player.favouriteGame,
       unclaimed: false,

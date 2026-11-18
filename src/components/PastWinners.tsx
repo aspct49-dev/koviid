@@ -1,29 +1,29 @@
-import { formatMoney, periodLabel } from '@/lib/format';
-import { PAYING_RANK_MODE } from '@/lib/partners';
+import { formatMoney, periodRange } from '@/lib/format';
 import type { Leaderboard } from '@/lib/types';
 import { TrophyIcon } from './icons';
 
 /**
- * Last month's board, settled. The first question about any community
+ * The previous board, settled. The first question about any community
  * leaderboard is whether it pays, and past winners answer it without claiming
  * anything.
  *
- * Renders nothing when last month had no players: an empty "previous winners"
+ * Renders nothing when that board had no players: an empty "previous winners"
  * block answers that question the wrong way round.
  *
- * Not switchable. A settled month paid out on one measure and no other, so
- * offering to re-rank it would show an order that never happened next to the
- * prizes that actually went out.
+ * Ordered on the measure *that* board paid on, which is not necessarily the
+ * one the current board pays on. October paid on raw wager; re-ranking it by
+ * weighted would show an order that never happened next to the prizes that
+ * actually went out.
  */
 export function PastWinners({ board }: { board: Leaderboard }) {
-  const winners = board.rankings[PAYING_RANK_MODE].entries.filter((e) => !e.unclaimed).slice(0, 5);
+  const winners = board.rankings[board.pays].entries.filter((e) => !e.unclaimed).slice(0, 5);
   if (!winners.length || board.error) return null;
 
   return (
     <section className="section wrap">
       <div className="section-head">
-        <h2 className="h-section">Last Month</h2>
-        <p>{periodLabel(board.periodStart)}, settled and paid.</p>
+        <h2 className="h-section">Previous Board</h2>
+        <p>{periodRange(board.periodStart, board.periodEnd)}, settled and paid.</p>
       </div>
 
       <div className="past">

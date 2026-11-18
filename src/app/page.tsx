@@ -8,11 +8,18 @@ import { HowToEnter } from '@/components/HowToEnter';
 import { PastWinners } from '@/components/PastWinners';
 import { Rewards } from '@/components/Rewards';
 import { Podium } from '@/components/Podium';
-import { RankModeProvider, RankSwitch } from '@/components/RankMode';
 import { Socials } from '@/components/Socials';
 import { ExternalIcon, ShieldIcon } from '@/components/icons';
-import { currentPeriod, formatMoney, periodLabel, previousPeriod } from '@/lib/format';
-import { FAIR_PLAY, LEADERBOARD_PAUSED, PRIMARY_PARTNER, WAGER_NOTE, WAGER_WEIGHTS } from '@/lib/partners';
+import { dayLabel, formatMoney, periodRange } from '@/lib/format';
+import {
+  FAIR_PLAY,
+  LEADERBOARD_PAUSED,
+  PRIMARY_PARTNER,
+  RANK_MODE_LABEL,
+  WAGER_NOTE,
+  WAGER_WEIGHTS,
+} from '@/lib/partners';
+import { currentBoard, previousBoard } from '@/lib/schedule';
 import { pageMeta } from '@/lib/site';
 import { getLeaderboard } from '@/lib/services/leaderboard';
 
@@ -20,21 +27,22 @@ export const revalidate = 60;
 
 export const metadata: Metadata = pageMeta({
   title: 'Leaderboard',
-  description: `The ${formatMoney(PRIMARY_PARTNER.prizePool)} monthly ${PRIMARY_PARTNER.name} wager leaderboard. Ten paying places, settled at the end of every month.`,
+  description: `The ${formatMoney(PRIMARY_PARTNER.prizePool)} ${PRIMARY_PARTNER.name} wager leaderboard under code ${PRIMARY_PARTNER.code}. Ten paying places, ranked on weighted wager.`,
   path: '/',
 });
 
 export default async function LeaderboardPage() {
   // Both boards in one round trip rather than one after the other — they are
-  // independent calls and awaiting them in sequence would put last month's
-  // latency on top of this month's for no reason.
+  // independent calls and awaiting them in sequence would put the previous
+  // board's latency on top of this one's for no reason.
   const [board, previous] = await Promise.all([
-    getLeaderboard('roobet', currentPeriod()),
-    getLeaderboard('roobet', previousPeriod()),
+    getLeaderboard('roobet', currentBoard()),
+    getLeaderboard('roobet', previousBoard()),
   ]);
+  const seats = board.rankings[board.pays].entries.length;
 
   return (
-    <RankModeProvider>
+    <>
       {/*
        * The wordmark, whose board it is, the offer as one headline, the terms
        * in a line, and the two things to do — then the top three. The order is
@@ -66,19 +74,20 @@ export default async function LeaderboardPage() {
           />
 
           <h1 className="lb-headline">
-            <span className="lb-amount">{formatMoney(board.prizePool)}</span> monthly leaderboard
+            <span className="lb-amount">{formatMoney(board.prizePool)}</span> leaderboard
           </h1>
 
           <p className="lb-lede">
             {LEADERBOARD_PAUSED ? (
               <>
-                The leaderboard is paused for now. Last month&rsquo;s results are below, and the board
-                will be announced on the socials when it resumes.
+                The leaderboard is paused for now. The last board&rsquo;s results are below, and the
+                board will be announced on the socials when it resumes.
               </>
             ) : (
               <>
-                Compete against everyone else playing under code <b>{PRIMARY_PARTNER.code}</b>. Ten
-                places pay, and the board settles at the end of the month.
+                Compete against everyone else playing under code <b>{PRIMARY_PARTNER.code}</b>.{' '}
+                {seats} places pay on {RANK_MODE_LABEL[board.pays].toLowerCase()} wager, and the board
+                settles on {dayLabel(board.periodEnd)}.
               </>
             )}
           </p>
@@ -112,29 +121,21 @@ export default async function LeaderboardPage() {
         </div>
       </header>
 
-      {/* While paused, the settled month is the thing worth reading, so it
+      {/* While paused, the settled board is the thing worth reading, so it
           moves up to sit directly under the notice. */}
       {LEADERBOARD_PAUSED && <PastWinners board={previous} />}
 
       <section className="section wrap" id="standings">
-        {/* The month the board is for. It used to sit in the hero as part of a
-            chip; it belongs on the standings, which are the thing that is
-            specific to a month. */}
-        {!LEADERBOARD_PAUSED && (
-          <div className="section-head">
-            <h2 className="h-section">Standings</h2>
-            <p>
-              {periodLabel(board.periodStart)} · {PRIMARY_PARTNER.prizeTable.length} paying places
-            </p>
-          </div>
-        )}
-
-        {/* The switch sits with the table rather than with the podium, because
-            this is where someone is reading figures closely enough to want the
-            other measure. It governs both. */}
+        {/* The dates the board runs over. They belong on the standings, which
+            are the thing that is specific to them. */}
         {!LEADERBOARD_PAUSED && (
           <>
-            <RankSwitch />
+            <div className="section-head">
+              <h2 className="h-section">Standings</h2>
+              <p>
+                {periodRange(board.periodStart, board.periodEnd)} · {seats} paying places
+              </p>
+            </div>
             <Board board={board} />
             <BoardStats board={board} />
           </>
@@ -147,25 +148,15 @@ export default async function LeaderboardPage() {
           <p className="lede" style={{ marginTop: 12 }}>
             {WAGER_NOTE}
           </p>
-          {/* Describes the weighted view of the standings, so it goes with them. */}
-          {!LEADERBOARD_PAUSED && (
-            <>
-              <p className="lede" style={{ marginTop: 10 }}>
-                The standings above can also be viewed weighted, which is {PRIMARY_PARTNER.name}
-                &rsquo;s own measure: each bet discounted by the RTP of the game it was placed on.
-                That view is there for comparison and does not decide prizes. Their bands:
-              </p>
-  
-              <div style={{ marginTop: 16 }}>
-                {WAGER_WEIGHTS.map((w) => (
-                  <div className="kv" key={w.band}>
-                    <span>{w.band}</span>
-                    <b>{w.weight} counted when weighted</b>
-                  </div>
-                ))}
+          {/* The bands that turn a raw figure into the weighted one that pays. */}
+          <div style={{ marginTop: 16 }}>
+            {WAGER_WEIGHTS.map((w) => (
+              <div className="kv" key={w.band}>
+                <span>{w.band}</span>
+                <b>{w.weight} counts</b>
               </div>
-            </>
-          )}
+            ))}
+          </div>
 
           {/* The two disqualifying rules, stated as rules rather than as a
               threat — and stated here, where someone can read them before they
@@ -200,12 +191,12 @@ export default async function LeaderboardPage() {
           the code gets you reads better once they have seen it. */}
       <Rewards />
 
-      {/* Renders nothing in a first month, when there is no previous board. */}
+      {/* Renders nothing when there is no previous board with players. */}
       {!LEADERBOARD_PAUSED && <PastWinners board={previous} />}
 
       <HowToEnter />
       <Faq />
       <Socials />
-    </RankModeProvider>
+    </>
   );
 }

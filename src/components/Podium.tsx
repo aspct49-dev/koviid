@@ -1,9 +1,6 @@
-'use client';
-
 import { formatMoney } from '@/lib/format';
-import { RANK_MODES } from '@/lib/partners';
-import { useRankMode } from './RankMode';
-import type { Leaderboard, LeaderboardEntry } from '@/lib/types';
+import { RANK_MODE_LABEL, otherMode } from '@/lib/partners';
+import type { Leaderboard, LeaderboardEntry, RankMode } from '@/lib/types';
 import { TrophyIcon } from './icons';
 
 /**
@@ -21,8 +18,7 @@ const PLACES = [
 ] as const;
 
 export function Podium({ board }: { board: Leaderboard }) {
-  const { mode } = useRankMode();
-  const entries = board.rankings[mode].entries;
+  const entries = board.rankings[board.pays].entries;
 
   return (
     <div className="podium">
@@ -33,7 +29,7 @@ export function Podium({ board }: { board: Leaderboard }) {
           place={place}
           rank={rank}
           label={label}
-          metric={RANK_MODES[mode].metric}
+          pays={board.pays}
         />
       ))}
     </div>
@@ -45,17 +41,18 @@ function PodiumCard({
   place,
   rank,
   label,
-  metric,
+  pays,
 }: {
   entry: LeaderboardEntry | undefined;
   place: number;
   rank: string;
   label: string;
-  metric: string;
+  pays: RankMode;
 }) {
   // A paying seat nobody has taken is the ordinary case at this community
   // size, so the card renders with the prize still on it and says so plainly.
   const open = !entry || entry.unclaimed;
+  const alt = otherMode(pays);
 
   return (
     <article
@@ -80,7 +77,7 @@ function PodiumCard({
 
           <p className="pod-name">{open ? 'Open seat' : entry.username}</p>
 
-          <p className="pod-metric">{metric}</p>
+          <p className="pod-metric">{RANK_MODE_LABEL[pays]}</p>
           <p className="pod-wagered">
             <span className="sym">$</span>
             {(open ? 0 : entry.wagered).toLocaleString('en-US', {
@@ -88,6 +85,15 @@ function PodiumCard({
               maximumFractionDigits: 2,
             })}
           </p>
+
+          {/* The other measure, small and labelled, so it reads as a reference
+              figure and not as a second score. */}
+          {!open && (
+            <p className="pod-alt">
+              <span className="alt-tag">{RANK_MODE_LABEL[alt]}</span>
+              {formatMoney(entry[alt])}
+            </p>
+          )}
 
           <div className="pod-rule" />
 

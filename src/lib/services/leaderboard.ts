@@ -1,8 +1,7 @@
 import 'server-only';
 
-import { currentPeriod } from '../format';
-import { getPartner } from '../partners';
 import { roobetProvider } from '../providers/roobet';
+import { currentBoard } from '../schedule';
 import { buildEntries } from '../providers/shared';
 import type { Leaderboard, LeaderboardProvider, PartnerId, Period } from '../types';
 
@@ -26,17 +25,15 @@ const PROVIDERS: Record<PartnerId, LeaderboardProvider> = {
  * UI carries the "temporarily unavailable" notice above it.
  */
 function fallbackFor(partnerId: PartnerId, period: Period, error: string): Leaderboard {
-  const partner = getPartner(partnerId);
   const empty = {
-    entries: buildEntries([], partner.prizeTable),
+    entries: buildEntries([], period.prizeTable),
     stats: { players: 0, totalWagered: 0, topWager: 0 },
   };
   return {
     partnerId,
-    prizePool: partner.prizePool,
-    // Both modes, so the switch still works while the feed is down and shows
-    // the same empty board either way instead of disappearing.
+    prizePool: period.prizeTable.reduce((sum, n) => sum + n, 0),
     rankings: { raw: empty, weighted: empty },
+    pays: period.pays,
     periodStart: period.start.toISOString(),
     periodEnd: period.end.toISOString(),
     updatedAt: new Date().toISOString(),
@@ -47,7 +44,7 @@ function fallbackFor(partnerId: PartnerId, period: Period, error: string): Leade
 
 export async function getLeaderboard(
   partnerId: PartnerId,
-  period: Period = currentPeriod(),
+  period: Period = currentBoard(),
 ): Promise<Leaderboard> {
   try {
     return await PROVIDERS[partnerId].fetchLeaderboard(period);

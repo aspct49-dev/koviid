@@ -31,9 +31,9 @@ export const SITE = {
   handle: '@koviid',
   url: resolveUrl(),
   locale: 'en_US',
-  tagline: 'The monthly Roobet wager leaderboard for the Koviid community.',
+  tagline: 'The Roobet wager leaderboard for the Koviid community.',
   description:
-    'Ten paying places on the monthly Roobet wager leaderboard, ranked on weighted wager and settled at the end of every month. Play under code koviid to enter.',
+    'Ten paying places on the Roobet wager leaderboard, ranked on weighted wager. Play under code koviid to enter.',
 };
 
 export const SOCIAL_PROFILES = [

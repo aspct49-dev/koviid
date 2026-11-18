@@ -69,7 +69,8 @@ export default function PrivacyPage() {
           account identifier, a wagered total and a weighted wagered total.
         </p>
         <p>
-          We publish only a <b>partially masked username</b> and the weighted wagered figure.
+          We publish only a <b>partially masked username</b> and the weighted and raw wagered
+          figures.
           Usernames are masked to their last four characters before they reach the page, and the
           account identifier is never displayed. We do not receive, and cannot see, your real name,
           your email address, your location, your balance, your deposits, your withdrawals or your

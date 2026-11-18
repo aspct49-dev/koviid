@@ -80,7 +80,7 @@ export const MILESTONE_STEPS = [
   {
     n: 1,
     title: 'Play under the code',
-    body: `Everything you wager on ${PARTNERS.roobet.name} under code ${PARTNERS.roobet.code} adds to your lifetime total. It does not reset at the end of the month the way the leaderboard does.`,
+    body: `Everything you wager on ${PARTNERS.roobet.name} under code ${PARTNERS.roobet.code} adds to your lifetime total. It does not reset when a leaderboard ends the way the leaderboard does.`,
   },
   {
     n: 2,

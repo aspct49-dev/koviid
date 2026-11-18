@@ -1,12 +1,38 @@
 import type { NavLink, Partner, PartnerId, RankMode, SocialCard } from './types';
 
 /**
- * Payout per rank, index 0 = 1st. The pool is summed from this, never typed
- * out separately, so the headline figure and the table cannot disagree.
- *
- * Ten paying places out of $500.
+ * Payout per rank, index 0 = 1st. A pool is always summed from its table,
+ * never typed out separately, so the headline figure and the table cannot
+ * disagree.
  */
-const ROOBET_PRIZES = [200, 100, 60, 40, 30, 20, 15, 15, 10, 10];
+
+/** Up to and including October 2026: ten places out of $500. */
+const PRIZES_500 = [200, 100, 60, 40, 30, 20, 15, 15, 10, 10];
+
+/** From November 2026: ten places out of $1,000. */
+const PRIZES_1000 = [500, 140, 90, 70, 55, 45, 35, 25, 20, 20];
+
+/** The table the running board pays on. */
+const ROOBET_PRIZES = PRIZES_1000;
+
+/**
+ * Every board that has run or is running, oldest first, each with its own
+ * prize table and the measure it pays on.
+ *
+ * Both live on the board rather than globally because they have changed
+ * between boards: October paid $500 on raw wager, and a settled board has to
+ * keep showing the order and the prizes that actually went out.
+ *
+ * Dates are UTC and inclusive: a board opens at 00:00:00 on `start` and closes
+ * at 23:59:59 on `end`. Boards must be contiguous. Once the last one here has
+ * closed, boards carry on by calendar month on the last entry's terms (see
+ * `src/lib/schedule.ts`), so add an entry here whenever the next one differs.
+ */
+export const BOARDS: { start: string; end: string; prizeTable: number[]; pays: RankMode }[] = [
+  { start: '2026-10-01', end: '2026-10-31', prizeTable: PRIZES_500, pays: 'raw' },
+  // Extended past a calendar month, and every wager since 1 November counts.
+  { start: '2026-11-01', end: '2026-12-17', prizeTable: PRIZES_1000, pays: 'weighted' },
+];
 
 /**
  * The partner registry. Prize pools, splits and codes live here and nowhere
@@ -38,7 +64,7 @@ export const DISCORD_INVITE = 'https://discord.gg/GDrPqTeCyQ';
  * the live podium, countdown and standings and says so, and the settled
  * previous month moves to the top. Flip back to false to resume.
  */
-export const LEADERBOARD_PAUSED = true;
+export const LEADERBOARD_PAUSED = false;
 
 export const PARTNER_ORDER: PartnerId[] = ['roobet'];
 
@@ -66,51 +92,23 @@ export const WAGER_WEIGHTS = [
   { band: 'RTP of 99% and over', weight: '10%', note: 'Dice and the lowest-edge originals' },
 ];
 
-/** What settles the month, said before anything about the other view. */
-export const WAGER_NOTE =
-  'Prizes settle on total amount wagered, at face value. Every bet counts for what it was staked, whatever game it was placed on.';
+/** What settles the board, and what the smaller figure beside it is. */
+export const WAGER_NOTE = `Prizes settle on weighted wager, ${PARTNERS.roobet.name}'s own measure: each bet counts at a rate set by the RTP of the game it was placed on. The smaller "raw" figure shown with every player is their total at face value, the same number ${PARTNERS.roobet.name} shows you. It is there for reference and does not decide placings.`;
 
 /**
- * The two ways the same month can be ordered, and what to call each.
- *
- * `pays` is the one that settles. It is a field rather than something the UI
- * infers from the default, because the whole hazard of a switcher on a board
- * with money attached is someone screenshotting the view that does not pay and
- * believing it. Every surface that renders a mode reads this flag.
+ * What each measure is called on screen. The one a board pays on is shown
+ * large; the other sits under it, labelled, so nobody has to switch views to
+ * compare them and nobody can mistake which one pays.
  */
-export const RANK_MODES: Record<RankMode, {
-  id: RankMode;
-  /** On the switch itself. */
-  label: string;
-  /** Column head and the metric line on a podium card. */
-  metric: string;
-  /** One line under the switch saying what this ordering is. */
-  note: string;
-  pays: boolean;
-}> = {
-  raw: {
-    id: 'raw',
-    label: 'Unweighted',
-    metric: 'Wagered',
-    note: 'Every bet at face value, the same figure Roobet shows you.',
-    pays: true,
-  },
-  weighted: {
-    id: 'weighted',
-    label: 'Weighted',
-    metric: 'Weighted',
-    note: `Each bet discounted by the game's RTP, using ${PARTNERS.roobet.name}'s own weighting.`,
-    pays: false,
-  },
+export const RANK_MODE_LABEL: Record<RankMode, string> = {
+  raw: 'Raw',
+  weighted: 'Weighted',
 };
 
-/** What the board settles on, and what it opens on. */
-export const DEFAULT_RANK_MODE: RankMode = 'raw';
-
-/** The mode that actually pays, derived so the two can never disagree. */
-export const PAYING_RANK_MODE: RankMode = (
-  Object.values(RANK_MODES).find((m) => m.pays) ?? RANK_MODES.raw
-).id;
+/** The measure that is not `mode`, i.e. the one shown in small type. */
+export function otherMode(mode: RankMode): RankMode {
+  return mode === 'weighted' ? 'raw' : 'weighted';
+}
 
 /**
  * The two ways a player gets removed from the board, stated as rules rather
@@ -126,7 +124,7 @@ export const FAIR_PLAY = [
   {
     id: 'abuse',
     title: 'No wager abuse',
-    body: `Grinding a low-edge game is fine and counts in full, because the paying board does not discount it. What does not count is wagering that is not really play: matched or hedged betting that covers both sides of an outcome, stakes cycled between accounts, and anything Roobet flags as bonus or promotion abuse.`,
+    body: `Playing a low-edge game is fine; it simply counts at the weighted rate its RTP band sets. What does not count is wagering that is not really play: matched or hedged betting that covers both sides of an outcome, stakes cycled between accounts, and anything Roobet flags as bonus or promotion abuse.`,
   },
 ];
 
@@ -145,7 +143,7 @@ export const JOIN_STEPS = [
   {
     n: 3,
     title: 'Start wagering',
-    body: 'Every weighted dollar from that point counts. The board updates through the month and settles when it ends.',
+    body: 'Every weighted dollar from that point counts. The board updates as you play and settles when the countdown runs out.',
   },
 ] as const;
 
@@ -161,11 +159,11 @@ export const JOIN_STEPS = [
 export const FAQ = [
   {
     q: 'Why is my wagered figure here lower than on Roobet?',
-    a: `Because the board ranks on weighted wager rather than raw wager. Roobet discounts every bet by the game's RTP: the higher the RTP, the less of that bet counts. A month spent on dice therefore contributes far less than the same money put through slots. The bands are in the table above. The standings also refresh about once a minute, so a bet you have just placed can take a moment to appear.`
+    a: `Because the board ranks on weighted wager rather than raw wager. Roobet discounts every bet by the game's RTP: the higher the RTP, the less of that bet counts. Money put through dice therefore contributes far less than the same money put through slots. The bands are in the wager rules above, and your raw total is shown in small type under your weighted figure. The standings also refresh about once a minute, so a bet you have just placed can take a moment to appear.`
   },
   {
     q: 'When does the board settle, and when do I get paid?',
-    a: `The board closes at 23:59:59 UTC on the last day of the month. Once it has fully closed, the standings are checked against the affiliate stats and prizes go out after that. To claim, open a ticket in the Discord with your Roobet username.`,
+    a: `The board closes at 23:59:59 UTC on its end date, which is shown with the standings and counted down at the top of the page. Once it has fully closed, the standings are checked against the affiliate stats and prizes go out after that. To claim, open a ticket in the Discord with your Roobet username.`,
   },
   {
     q: 'Do I have to sign up again if I already have a Roobet account?',
@@ -177,7 +175,7 @@ export const FAQ = [
   },
   {
     q: 'What happens if someone above me is disqualified?',
-    a: `Everyone below moves up a place and takes the prize attached to their new position. Places are settled on the final standings, after any removals, not on the board as it looked mid-month.`,
+    a: `Everyone below moves up a place and takes the prize attached to their new position. Places are settled on the final standings, after any removals, not on the board as it looked part-way through.`,
   },
   {
     q: 'Is the leaderboard run by Roobet?',
@@ -270,8 +268,8 @@ export const REWARDS = [
   {
     id: 'leaderboard',
     figure: `$${ROOBET_PRIZES.reduce((s, n) => s + n, 0)}`,
-    title: 'Monthly leaderboard',
-    body: `Ten paying places every month, ranked on weighted wager. Play under code ${PARTNERS.roobet.code} and you are on the board. There is nothing to opt into.`,
+    title: 'Leaderboard',
+    body: `Ten paying places, ranked on weighted wager. Play under code ${PARTNERS.roobet.code} and you are on the board. There is nothing to opt into.`,
     href: '#standings',
     cta: 'See the board',
     external: false,

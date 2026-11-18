@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { getPartner } from '../partners';
 import { buildEntries } from './shared';
 import type { Leaderboard, LeaderboardProvider, Period, RankMode, Ranking } from '../types';
 
@@ -18,10 +17,9 @@ import type { Leaderboard, LeaderboardProvider, Period, RankMode, Ranking } from
  *      the period we display, and the two cannot drift. See `isoDate` and
  *      `exclusiveEnd` for the half-open window this endpoint actually uses.
  *   2. It returns both `wagered` and `weightedWagered`. Roobet weights by RTP
- *      to discourage low-edge grinding, and the published rules
- *      rank on the weighted figure, so that is the one used here. The raw
- *      figure is deliberately not shown, because showing both invites the
- *      question of which one pays.
+ *      to discourage low-edge grinding. Both are ranked and both are carried
+ *      on every row; which one a board pays on is set per board in `BOARDS`,
+ *      and the UI shows that one large with the other under it.
  */
 
 /** The fields we use out of a Roobet stats row. */
@@ -88,6 +86,8 @@ function rank(rows: RoobetRow[], mode: RankMode, prizeTable: number[]): Ranking 
       sorted.map((row) => ({
         username: row.username,
         wagered: figure(row, mode),
+        raw: figure(row, 'raw'),
+        weighted: figure(row, 'weighted'),
         // Carried through but not rendered — on a masked name it would be the
         // only identifying detail left.
         favouriteGame: row.favoriteGameTitle,
@@ -106,7 +106,6 @@ export const roobetProvider: LeaderboardProvider = {
   partnerId: 'roobet',
 
   async fetchLeaderboard(period: Period): Promise<Leaderboard> {
-    const partner = getPartner('roobet');
     const { token, userId } = readCredentials();
 
     const url = new URL(ENDPOINT);
@@ -133,14 +132,14 @@ export const roobetProvider: LeaderboardProvider = {
 
     return {
       partnerId: 'roobet',
-      prizePool: partner.prizePool,
-      // Both orderings, every request. The switch between them is a client-side
-      // toggle, and a round trip per flip would make it feel like a page it is
-      // not. Ranking the same 20-odd rows twice costs nothing.
+      prizePool: period.prizeTable.reduce((sum, n) => sum + n, 0),
+      // Both orderings, every request. Ranking the same 20-odd rows twice
+      // costs nothing, and the stats line wants both totals.
       rankings: {
-        raw: rank(payload, 'raw', partner.prizeTable),
-        weighted: rank(payload, 'weighted', partner.prizeTable),
+        raw: rank(payload, 'raw', period.prizeTable),
+        weighted: rank(payload, 'weighted', period.prizeTable),
       },
+      pays: period.pays,
       periodStart: period.start.toISOString(),
       periodEnd: period.end.toISOString(),
       updatedAt: new Date().toISOString(),

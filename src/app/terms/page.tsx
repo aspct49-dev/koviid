@@ -8,23 +8,23 @@ import { pageMeta } from '@/lib/site';
 
 export const metadata: Metadata = pageMeta({
   title: 'Terms of Service',
-  description: `The terms covering use of ${SITE.name} and entry to the monthly ${PRIMARY_PARTNER.name} wager leaderboard.`,
+  description: `The terms covering use of ${SITE.name} and entry to the ${PRIMARY_PARTNER.name} wager leaderboard.`,
   path: '/terms',
 });
 
-const UPDATED = '2026-09-19';
+const UPDATED = '2026-11-18';
 
 export default function TermsPage() {
   return (
     <LegalPage
       title="Terms of Service"
       updated={UPDATED}
-      lede={`These terms cover your use of ${SITE.name} and your entry to the monthly leaderboard. By using the site or entering the leaderboard, you accept them.`}
+      lede={`These terms cover your use of ${SITE.name} and your entry to the leaderboard. By using the site or entering the leaderboard, you accept them.`}
     >
       <section>
         <h2>1. Who we are</h2>
         <p>
-          {SITE.name} is an independent community website that runs a monthly wager leaderboard for
+          {SITE.name} is an independent community website that runs a wager leaderboard for
           players who sign up to {PRIMARY_PARTNER.name} using the referral code{' '}
           <b>{PRIMARY_PARTNER.code}</b>.
         </p>
@@ -63,21 +63,22 @@ export default function TermsPage() {
       <section>
         <h2>3. How the leaderboard works</h2>
         <p>
-          The leaderboard period is one calendar month, beginning at 00:00 UTC on the first day and
-          ending at 23:59:59 UTC on the last day.
+          Each leaderboard period runs between the start and end dates shown on the leaderboard
+          page, beginning at 00:00 UTC on the first day and ending at 23:59:59 UTC on the last. A
+          period is normally one calendar month but may be set longer or shorter, in which case
+          its dates are shown on the leaderboard page before it starts or, where a running period
+          is extended, from the time of the extension.
         </p>
         <p>
-          Players are ranked, and prizes are settled, on <b>total amount wagered</b> at face value.
-          Every bet counts for what it was staked, whatever game it was placed on, and no discount
-          is applied for a game&rsquo;s RTP or house edge.
+          Players are ranked, and prizes are settled, on <b>weighted wager</b>: the figure{' '}
+          {PRIMARY_PARTNER.name} reports after discounting each bet by the RTP band of the game it
+          was placed on. We do not set {PRIMARY_PARTNER.name}&rsquo;s weighting bands, we cannot
+          change them, and we apply no weighting of our own on top of theirs.
         </p>
         <p>
-          The leaderboard page also offers a <b>weighted</b> view, which re-orders the same month
-          using {PRIMARY_PARTNER.name}&rsquo;s own RTP discounting. That view is published for
-          comparison only. It does not decide placings and it does not decide prizes, and where the
-          two orderings disagree the unweighted one governs. We do not set {PRIMARY_PARTNER.name}
-          &rsquo;s weighting bands, we cannot change them, and we apply no weighting of our own on
-          top of either figure.
+          The leaderboard also shows each player&rsquo;s <b>raw</b> wager, every bet at face
+          value, for reference. The raw figure does not decide placings or prizes, and where the
+          two figures would order the board differently the weighted one governs.
         </p>
         <p>
           The prize pool is {formatMoney(PRIMARY_PARTNER.prizePool)}, paid across{' '}
@@ -97,7 +98,7 @@ export default function TermsPage() {
         <p>
           Usernames are shown partially masked. Standings shown on the site are updated
           periodically and may lag behind {PRIMARY_PARTNER.name} by a short interval; they are
-          indicative during the month and are not final until the month has closed and been
+          indicative while the period is running and are not final until it has closed and been
           verified.
         </p>
       </section>
@@ -113,7 +114,7 @@ export default function TermsPage() {
           </li>
           <li>
             <b>Wager abuse.</b> Wagering designed to inflate a leaderboard figure rather than to
-            play. Choosing a low-edge game is not abuse and counts in full; matched or hedged
+            play. Choosing a low-edge game is not abuse and counts at its weighted rate; matched or hedged
             betting that covers both sides of an outcome, stakes cycled between accounts, and any
             activity {PRIMARY_PARTNER.name} identifies as bonus or promotion abuse are.
           </li>
@@ -129,7 +130,7 @@ export default function TermsPage() {
         <p>
           Where a player is removed, everyone below them moves up one place and takes the prize
           attached to their new position. Places are settled on the final standings after any
-          removals, not on the board as it appeared during the month.
+          removals, not on the board as it appeared while the period was running.
         </p>
       </section>
 
@@ -141,7 +142,7 @@ export default function TermsPage() {
             balance of, {PRIMARY_PARTNER.name}.
           </li>
           <li>
-            Standings are verified against the affiliate statistics after the month has fully
+            Standings are verified against the affiliate statistics after the period has fully
             closed. Prizes are issued after that verification.
           </li>
           <li>
@@ -154,7 +155,7 @@ export default function TermsPage() {
           </li>
           <li>
             An unclaimed prize may be forfeited if we cannot reach you or you do not respond within
-            a reasonable period after the month closes.
+            a reasonable time after the period closes.
           </li>
           <li>
             Prizes are personal to you and may not be sold, assigned or transferred to another
@@ -196,8 +197,9 @@ export default function TermsPage() {
         <p>
           We may change the prize pool, the split, the number of paying places or these terms. Where
           a change affects a leaderboard that is already running, we will apply it from the start of
-          the next monthly period rather than mid-month, except where a change is required by law or
-          is needed to correct an error.
+          the next period rather than part-way through, except where a change is required by law,
+          is needed to correct an error, or applies to a period that was paused and is being
+          resumed.
         </p>
         <p>
           We may suspend or discontinue the leaderboard. If we do so mid-period, we will settle the

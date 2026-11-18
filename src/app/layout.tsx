@@ -35,7 +35,7 @@ const sans = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.name} — Monthly Roobet leaderboard`,
+    default: `${SITE.name} — Roobet leaderboard`,
     template: `%s — ${SITE.name}`,
   },
   description: SITE.description,
@@ -49,12 +49,12 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     locale: SITE.locale,
     url: '/',
-    title: `${SITE.name} — Monthly Roobet leaderboard`,
+    title: `${SITE.name} — Roobet leaderboard`,
     description: SITE.tagline,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE.name} — Monthly Roobet leaderboard`,
+    title: `${SITE.name} — Roobet leaderboard`,
     description: SITE.tagline,
   },
   robots: {

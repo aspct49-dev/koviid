@@ -40,7 +40,7 @@ export default function MilestonesPage() {
 
           <p className="lb-lede">
             {MILESTONES.length} ranks, each paying once the first time you pass it. These run
-            alongside the monthly leaderboard — your lifetime wagered keeps climbing whether or not
+            alongside the leaderboard — your lifetime wagered keeps climbing whether or not
             you place.
           </p>
 
@@ -156,7 +156,7 @@ export default function MilestonesPage() {
           </span>
           The rank names and thresholds here are {SITE.name}&rsquo;s own, not{' '}
           {PRIMARY_PARTNER.name}&rsquo;s. They are measured on wagered amount at face value, the
-          same figure the leaderboard settles on, and the same fair-play rules apply.
+          raw figure shown in small type on the leaderboard, and the same fair-play rules apply.
         </p>
       </section>
     </>

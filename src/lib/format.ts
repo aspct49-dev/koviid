@@ -28,32 +28,38 @@ export function formatMoney(n: number, opts: { cents?: boolean } = {}): string {
   );
 }
 
-/** The current calendar month, which is the leaderboard period. */
-export function currentPeriod(now: Date = new Date()): { start: Date; end: Date } {
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0));
-  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0) - 1000);
-  return { start, end };
+/** "17 December", in UTC — the day a board closes. */
+export function dayLabel(iso: string): string {
+  return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
 }
 
 /**
- * The month before this one — the board that has already been settled.
+ * What a board's dates are called.
  *
- * Derived by stepping the month index back rather than by subtracting days:
- * `getUTCMonth() - 1` is defined for January (it rolls the year), where
- * subtracting 30 days would land in a different month depending on which one
- * you started in.
+ * A board that is exactly one calendar month reads as the month ("October
+ * 2026"); anything else reads as its dates ("1 November – 17 December 2026").
  */
-export function previousPeriod(now: Date = new Date()): { start: Date; end: Date } {
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1, 0, 0, 0));
-  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0) - 1000);
-  return { start, end };
-}
+export function periodRange(startIso: string, endIso: string): string {
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  const lastOfMonth = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth() + 1, 0)).getUTCDate();
+  const wholeMonth =
+    start.getUTCDate() === 1 &&
+    start.getUTCMonth() === end.getUTCMonth() &&
+    start.getUTCFullYear() === end.getUTCFullYear() &&
+    end.getUTCDate() === lastOfMonth;
 
-export function periodLabel(start: string): string {
-  return new Date(start).toLocaleString('en-US', {
+  if (wholeMonth) {
+    return start.toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  }
+  const sameYear = start.getUTCFullYear() === end.getUTCFullYear();
+  const from = start.toLocaleString('en-GB', {
+    day: 'numeric',
     month: 'long',
-    year: 'numeric',
+    ...(sameYear ? {} : { year: 'numeric' }),
     timeZone: 'UTC',
   });
+  const to = end.toLocaleString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  return `${from} – ${to}`;
 }
 

@@ -29,9 +29,8 @@ export interface Partner {
  *   `raw`      — every bet at face value, the number Roobet shows the player.
  *   `weighted` — each bet discounted by the game's RTP, Roobet's own measure.
  *
- * Both are computed and served on every request, because the switch between
- * them is a client-side toggle and a round trip per flip would make it feel
- * like a page it is not.
+ * Both are computed on every request. Each board names the one it pays on and
+ * shows the other beside it in small type.
  */
 export type RankMode = 'raw' | 'weighted';
 
@@ -41,6 +40,9 @@ export interface LeaderboardEntry {
   username: string;
   /** The figure *this* ranking is ordered on, in this ranking's own terms. */
   wagered: number;
+  /** Both measures, whichever this ranking is ordered on, so a row can show the other one too. */
+  raw: number;
+  weighted: number;
   prize: number;
   favouriteGame?: string;
   /** A paying seat nobody has taken yet. */
@@ -64,8 +66,10 @@ export interface Ranking {
 export interface Leaderboard {
   partnerId: PartnerId;
   prizePool: number;
-  /** The same period ordered both ways. The UI picks one. */
+  /** The same period ordered both ways. */
   rankings: Record<RankMode, Ranking>;
+  /** The ordering this board's prizes are settled on. */
+  pays: RankMode;
   periodStart: string;
   periodEnd: string;
   updatedAt: string;
@@ -80,9 +84,12 @@ export interface LeaderboardProvider {
   fetchLeaderboard(period: Period): Promise<Leaderboard>;
 }
 
+/** One board: when it runs, what it pays, and which measure it pays on. */
 export interface Period {
   start: Date;
   end: Date;
+  prizeTable: number[];
+  pays: RankMode;
 }
 
 /** One card in the socials panel at the foot of the page. */
